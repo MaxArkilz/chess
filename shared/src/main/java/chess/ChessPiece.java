@@ -158,35 +158,10 @@ public class ChessPiece {
             }
         }
         if (piece.getPieceType() == PieceType.PAWN){
-            int[][] directions = {{1,0},{1,-1},{1,1}};
-            for (int[] dir : directions){
-                int row = myPosition.getRow() + dir[0];
-                int col = myPosition.getColumn() + dir[1];
-
-                if (row >= 1 && row <= 8 && col >= 1 && col <= 8) {
-                    ChessPosition newPos = new ChessPosition(row, col);
-                    ChessPiece target = board.getPiece(newPos);
-
-                    if (target != null) {
-                        if (newPos.getColumn() == myPosition.getColumn()){
-                            break;
-                        } else {
-                            if (target.getTeamColor() != piece.getTeamColor()) {
-                                moves.add(new ChessMove(myPosition, newPos, null);
-                                break;
-                            }
-                        }
-                    }
-
-                    if (target == null) {
-                        if (newPos.getColumn() != myPosition.getColumn()) {
-                            break;
-                        } else {
-                            moves.add(new ChessMove(myPosition, newPos, null));
-                        }
-                    }
-                }
-            }
+            //direction based on color (negate all row operations for black?)
+            //starting row for double move
+            //promotion row and logic
+            //capture logic if enemy diagonal
         }
         if (piece.getPieceType() == PieceType.KNIGHT){
 
