@@ -3,6 +3,7 @@ package chess;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Represents a single chess piece
@@ -18,6 +19,20 @@ public class ChessPiece {
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
         this.type = type;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessPiece piece = (ChessPiece) o;
+        return pieceColor == piece.pieceColor && type == piece.type;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(pieceColor, type);
     }
 
     /**
@@ -152,7 +167,6 @@ public class ChessPiece {
                         if (target.getTeamColor() != piece.getTeamColor()) {
                             moves.add(new ChessMove(myPosition, newPos, null));
                         }
-                        break;
                     }
                 }
             }
@@ -162,6 +176,31 @@ public class ChessPiece {
             //starting row for double move
             //promotion row and logic
             //capture logic if enemy diagonal
+            int[][] directions = {{1,0},{1,-1},{1,1}};
+            int[] startRow = {2,0};
+            int[] promoRow = {8,0};
+            if (piece.getTeamColor() != ChessGame.TeamColor.WHITE) {
+                int[][] blkDirections ={{-1,0},{-1,-1},{-1,1}};
+                for (int [] dir : directions) {
+                    directions[0] = blkDirections[0];
+                }
+                startRow[0] = 7;
+                promoRow[0] = 1;
+            }
+            for (int[] dir : directions) {
+                int row = myPosition.getRow() + dir[0];
+                int col = myPosition.getColumn() + dir[1];
+
+                if (row <= 8 && row >= 1 && col <= 8 && col >= 1) {
+                    ChessPosition newPos = new ChessPosition(row, col);
+                    ChessPiece target = board.getPiece(newPos);
+
+                    //promotion
+                    //capture
+                    //starting leap
+                }
+            }
+
         }
         if (piece.getPieceType() == PieceType.KNIGHT){
 
