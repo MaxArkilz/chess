@@ -179,12 +179,14 @@ public class ChessPiece {
             int[][] directions = {{1, 0}, {1, -1}, {1, 1}};
             int startRow = 2;
             int promoRow = 8;
+            int jump = 2;
             if (piece.getTeamColor() != ChessGame.TeamColor.WHITE) {
                 for (int i = 0; i < directions.length; i++) {
                     directions[i][0] = -1;
                 }
                 startRow = 7;
                 promoRow = 1;
+                jump = -2;
             }
             for (int[] dir : directions) {
                 int row = myPosition.getRow() + dir[0];
@@ -193,6 +195,18 @@ public class ChessPiece {
                 if (row <= 8 && row >= 1 && col <= 8 && col >= 1) {
                     ChessPosition newPos = new ChessPosition(row, col);
                     ChessPiece target = board.getPiece(newPos);
+
+                    if (col == myPosition.getColumn() && myPosition.getRow() == startRow && target == null){
+                        int stRow = myPosition.getRow() + jump;
+                        int stCol = myPosition.getColumn();
+
+                        ChessPosition stLeap = new ChessPosition(stRow,stCol);
+                        ChessPiece stTarget = board.getPiece(stLeap);
+
+                        if (stTarget == null ) {
+                            moves.add(new ChessMove(myPosition,stLeap,null));
+                        }
+                    }
 
                     if (col != myPosition.getColumn()) {
                         if (target != null && target.getTeamColor() != piece.getTeamColor()) {
@@ -208,9 +222,25 @@ public class ChessPiece {
 
             }
         }
-            if (piece.getPieceType() == PieceType.KNIGHT) {
+        if (piece.getPieceType() == PieceType.KNIGHT) {
+            int[][] directions = {{2,1},{2,-1},{1,-2},{1,2},{-1,-2},{-1,2},{-2,-1},{-2,1}};
 
+            for (int[] dir:directions){
+                int row = myPosition.getRow() + dir[0];
+                int col = myPosition.getColumn() + dir[1];
+
+                if (row <= 8 && row >= 1 && col <= 8 && col >= 1 ) {
+                    ChessPosition newPos = new ChessPosition(row,col);
+                    ChessPiece target = board.getPiece(newPos);
+
+                    if (target == null) {
+                        moves.add(new ChessMove(myPosition,newPos,null));
+                    } else if (target.getTeamColor() != piece.getTeamColor()){
+                        moves.add(new ChessMove(myPosition,newPos,null));
+                    }
+                }
             }
+        }
         return moves;
         }
 
