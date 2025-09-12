@@ -13,22 +13,6 @@
 
     <packaging>jar</packaging>
 
-    <dependencies>
-        <!-- AI inserted code to help compilation error-->
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>5.8.2</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.13.2</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-
     <build>
         <finalName>shared</finalName>
         <plugins>
