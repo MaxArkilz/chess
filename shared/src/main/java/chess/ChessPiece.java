@@ -142,11 +142,11 @@ public class ChessPiece {
         int startRow = (this.pieceColor == ChessGame.TeamColor.WHITE) ? 2:7;
         int promoRow = (this.pieceColor == ChessGame.TeamColor.WHITE) ? 8:1;
 
-        int row = start.getRow() + facing;
+        int row = start.getRow();
         int col = start.getColumn();
 
-        if (insideBoard(row, col) && board.getPiece(new ChessPosition(row,col)) == null) {
-            pawnPromo(start,moves,promoRow,row,new ChessPosition(row,col));
+        if (insideBoard(row + facing, col) && board.getPiece(new ChessPosition(row + facing,col)) == null) {
+            pawnPromo(start,moves,promoRow,row + facing,new ChessPosition(row + facing,col));
 
 
             if (start.getRow() == startRow) {
@@ -157,7 +157,12 @@ public class ChessPiece {
             }
         }
 
-        //implement captures
+        for (int i: new int[] {-1,1}) {
+            if (insideBoard(row + facing, col + i) && board.getPiece(new ChessPosition(row + facing, col + i)) != null) {
+                if (this.pieceColor != board.getPiece(new ChessPosition(row + facing, col + i)).getTeamColor())
+                pawnPromo(start,moves,promoRow,row + facing, new ChessPosition(row + facing, col + i));
+            }
+        }
     }
 
     private boolean insideBoard(int row, int col) {
