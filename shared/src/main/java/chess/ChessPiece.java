@@ -147,8 +147,6 @@ public class ChessPiece {
 
         if (insideBoard(row + facing, col) && board.getPiece(new ChessPosition(row + facing,col)) == null) {
             pawnPromo(start,moves,promoRow,row + facing,new ChessPosition(row + facing,col));
-
-
             if (start.getRow() == startRow) {
                 int jump = start.getRow() + (2 * facing);
                 if (board.getPiece(new ChessPosition(jump,col)) == null) {
