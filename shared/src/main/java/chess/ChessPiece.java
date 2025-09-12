@@ -73,66 +73,16 @@ public class ChessPiece {
         ChessPiece piece = board.getPiece(myPosition);
         List<ChessMove> moves = new ArrayList<>();
         switch (this.type) {
-            case BISHOP -> slidingMoves(board, myPosition, moves, new int[][]{{1, 1}, {1, -1}, {-1, 1}, {-1, -1}} );
-            case KING -> stepMoves(board, myPosition, moves, new int[][]{{1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}, {-1, -1}, {0, -1}, {1, -1}});
-            case KNIGHT -> stepMoves(board, myPosition,moves,new int[][] {{2, 1}, {2, -1}, {1, -2}, {1, 2}, {-1, -2}, {-1, 2}, {-2, -1}, {-2, 1}});
-            case PAWN -> ;
-            case QUEEN -> slidingMoves(board, myPosition, moves, new int[][]{{1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}, {-1, -1}, {0, -1}, {1, -1}});
-            case ROOK -> slidingMoves(board, myPosition, moves,new int[][]{{1, 0}, {0, 1}, {-1, 0}, {0, -1}});
+            case BISHOP -> slidingMoves(board, myPosition, moves, new int[][]{{1, 1}, {1, -1}, {-1, 1}, {-1, -1}});
+            case KING ->
+                    stepMoves(board, myPosition, moves, new int[][]{{1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}, {-1, -1}, {0, -1}, {1, -1}});
+            case KNIGHT ->
+                    stepMoves(board, myPosition, moves, new int[][]{{2, 1}, {2, -1}, {1, -2}, {1, 2}, {-1, -2}, {-1, 2}, {-2, -1}, {-2, 1}});
+            case PAWN -> pawnMoves(board,myPosition,moves);
+            case QUEEN ->
+                    slidingMoves(board, myPosition, moves, new int[][]{{1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}, {-1, -1}, {0, -1}, {1, -1}});
+            case ROOK -> slidingMoves(board, myPosition, moves, new int[][]{{1, 0}, {0, 1}, {-1, 0}, {0, -1}});
 
-
-
-            if (piece.getPieceType() == PieceType.PAWN) {
-                //direction based on color (negate all row operations for black?)
-                //starting row for double move
-                //promotion row and logic
-                //capture logic if enemy diagonal
-                int[][] directions = {{1, 0}, {1, -1}, {1, 1}};
-                int startRow = 2;
-                int promoRow = 8;
-                int jump = 2;
-                if (piece.getTeamColor() != ChessGame.TeamColor.WHITE) {
-                    for (int i = 0; i < directions.length; i++) {
-                        directions[i][0] = -1;
-                    }
-                    startRow = 7;
-                    promoRow = 1;
-                    jump = -2;
-                }
-                for (int[] dir : directions) {
-                    int row = myPosition.getRow() + dir[0];
-                    int col = myPosition.getColumn() + dir[1];
-
-                    if (row <= 8 && row >= 1 && col <= 8 && col >= 1) {
-                        ChessPosition newPos = new ChessPosition(row, col);
-                        ChessPiece target = board.getPiece(newPos);
-
-                        if (col == myPosition.getColumn() && myPosition.getRow() == startRow && target == null) {
-                            int stRow = myPosition.getRow() + jump;
-                            int stCol = myPosition.getColumn();
-
-                            ChessPosition stLeap = new ChessPosition(stRow, stCol);
-                            ChessPiece stTarget = board.getPiece(stLeap);
-
-                            if (stTarget == null) {
-                                moves.add(new ChessMove(myPosition, stLeap, null));
-                            }
-                        }
-
-                        if (col != myPosition.getColumn()) {
-                            if (target != null && target.getTeamColor() != piece.getTeamColor()) {
-                                pawnPromo(myPosition, moves, promoRow, row, newPos);
-                            }
-                        } else {
-                            if (target == null) {
-                                pawnPromo(myPosition, moves, promoRow, row, newPos);
-                            }
-
-                        }
-                    }
-
-                }
-            }
         }
         return moves;
     }
@@ -188,7 +138,26 @@ public class ChessPiece {
     }
 
     private void pawnMoves (ChessBoard board, ChessPosition start, List<ChessMove> moves){
+        int facing = (this.pieceColor == ChessGame.TeamColor.WHITE) ? 1 : -1;
+        int startRow = (this.pieceColor == ChessGame.TeamColor.WHITE) ? 2:7;
+        int promoRow = (this.pieceColor == ChessGame.TeamColor.WHITE) ? 8:1;
 
+        int row = start.getRow() + facing;
+        int col = start.getColumn();
+
+        if (insideBoard(row, col) && board.getPiece(new ChessPosition(row,col)) == null) {
+            pawnPromo(start,moves,promoRow,row,new ChessPosition(row,col));
+
+
+            if (start.getRow() == startRow) {
+                int jump = start.getRow() + (2 * facing);
+                if (board.getPiece(new ChessPosition(jump,col)) == null) {
+                    moves.add(new ChessMove(start, new ChessPosition(jump, col), null));
+                }
+            }
+        }
+
+        //implement captures
     }
 
     private boolean insideBoard(int row, int col) {
