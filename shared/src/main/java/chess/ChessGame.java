@@ -27,10 +27,7 @@ public class ChessGame {
      *
      * @param team the team whose turn it is
      */
-    public void setTeamTurn(TeamColor team) {
-
-        this.currentTurn = team;
-    }
+    public void setTeamTurn(TeamColor team) {this.currentTurn = team;}
 
     /**
      * Enum identifying the 2 possible teams in a chess game
@@ -63,8 +60,31 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        // check moves against ChessPiece engine
+
+        ChessPiece piece = board.getPiece(move.getStartPosition());
+        Collection<ChessMove> legalMoves = piece.pieceMoves(board, move.getStartPosition());
+        if (!legalMoves.contains(move)) {
+            throw new InvalidMoveException();
+        }
+        // copy board and simulate moves
+        // will need a deep copy method in ChessBoard
+        ChessBoard testBoard = board.copy();
+        testBoard.applyMove(move);
+        // check if any moves put king in check
+
+        if (isInCheck(currentTurn)){
+            throw new InvalidMoveException("Move leaves king in check");
+        }
+
+        // apply move if no errors thrown
+        // switch turn
+        board.applyMove(move);
+        currentTurn = (currentTurn == TeamColor.WHITE)? TeamColor.BLACK:TeamColor.WHITE;
+
+
     }
+
 
     /**
      * Determines if the given team is in check
@@ -73,6 +93,7 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
+        // run simulation on all opposing pieces if current board setup allows for king capture
         throw new RuntimeException("Not implemented");
     }
 
@@ -103,7 +124,7 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        throw new RuntimeException("Not implemented");
+        this.board = board;
     }
 
     /**
@@ -112,7 +133,7 @@ public class ChessGame {
      * @return the chessboard
      */
     public ChessBoard getBoard() {
-        throw new RuntimeException("Not implemented");
+        return this.board;
     }
 
     private TeamColor currentTurn;

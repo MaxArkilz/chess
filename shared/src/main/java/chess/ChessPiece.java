@@ -21,6 +21,10 @@ public class ChessPiece {
         this.type = type;
     }
 
+    public ChessPiece copy() {
+        return new ChessPiece(this.pieceColor,this.type);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {
@@ -70,7 +74,7 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        ChessPiece piece = board.getPiece(myPosition);
+
         List<ChessMove> moves = new ArrayList<>();
         switch (this.type) {
             case BISHOP -> slidingMoves(board, myPosition, moves, new int[][]{{1, 1}, {1, -1}, {-1, 1}, {-1, -1}});
@@ -157,8 +161,9 @@ public class ChessPiece {
 
         for (int i: new int[] {-1,1}) {
             if (insideBoard(row + facing, col + i) && board.getPiece(new ChessPosition(row + facing, col + i)) != null) {
-                if (this.pieceColor != board.getPiece(new ChessPosition(row + facing, col + i)).getTeamColor())
-                pawnPromo(start,moves,promoRow,row + facing, new ChessPosition(row + facing, col + i));
+                if (this.pieceColor != board.getPiece(new ChessPosition(row + facing, col + i)).getTeamColor()) {
+                    pawnPromo(start,moves,promoRow,row + facing, new ChessPosition(row + facing, col + i));
+                }
             }
         }
     }
