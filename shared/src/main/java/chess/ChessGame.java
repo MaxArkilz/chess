@@ -63,17 +63,30 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece piece = board.getPiece(startPosition);
-        if (board == null || piece.getTeamColor() != currentTurn) return List.of();
+        if (piece == null || board == null) return null;
 
         Collection<ChessMove> possibleMoves = piece.pieceMoves(board,startPosition);
         List<ChessMove> legalMoves = new ArrayList<>();
 
         for (ChessMove move : possibleMoves){
-            ChessBoard copy = board.copy();
-            copy.applyMove(move);
+            ChessPosition startPos = move.getStartPosition();
+            ChessPosition endPos = move.getEndPosition();
+            ChessPiece movedPiece = board.getPiece(startPos);
+            ChessPiece capturedPiece = board.getPiece(endPos);
+
+            board.addPiece(endPos,movedPiece);
+            board.addPiece(startPos,null);
+
+            if (move.getPromotionPiece() != null){
+                board.addPiece(endPos,new ChessPiece(movedPiece.getTeamColor(),move.getPromotionPiece()));
+            }
+
             if (!isInCheck(piece.getTeamColor())) {
                 legalMoves.add(move);
             }
+
+            board.addPiece(startPos,movedPiece);
+            board.addPiece(endPos,capturedPiece);
         }
         return legalMoves;
     }
