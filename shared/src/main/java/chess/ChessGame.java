@@ -16,6 +16,7 @@ public class ChessGame {
     public ChessGame() {
         this.currentTurn = TeamColor.WHITE;
         this.board = new ChessBoard();
+        this.board.resetBoard();
     }
 
     /**
@@ -45,6 +46,7 @@ public class ChessGame {
     public int hashCode() {
         return Objects.hash(currentTurn, board);
     }
+
 
     /**
      * Enum identifying the 2 possible teams in a chess game
@@ -99,13 +101,20 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        // check using valid moves
-        if (validMoves(move.getStartPosition())==null || !validMoves(move.getStartPosition()).contains(move)){ throw new InvalidMoveException();}
+        Collection<ChessMove> moves = validMoves(move.getStartPosition());
+
+        if (moves == null || !moves.contains(move)) {
+            throw new InvalidMoveException();
+        }
+
+        ChessPiece movedPiece = board.getPiece(move.getStartPosition());
+
+        if (movedPiece.getTeamColor() != currentTurn) {
+            throw new InvalidMoveException();
+        }
+
             ChessPosition startPos = move.getStartPosition();
             ChessPosition endPos = move.getEndPosition();
-            ChessPiece movedPiece = board.getPiece(startPos);
-
-            if (movedPiece.getTeamColor() != currentTurn) {throw new InvalidMoveException();}
 
             // make moves
             board.addPiece(endPos, movedPiece);
@@ -167,7 +176,7 @@ public class ChessGame {
                 if (piece != null && piece.getTeamColor() == teamColor) {
                     Collection<ChessMove> moves = validMoves(position);
                     if (moves != null && !moves.isEmpty()) {
-                        return false; // Has legal moves to escape check
+                        return false;
                     }
                 }
             }
@@ -183,7 +192,24 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+
+        if (isInCheck(teamColor)) {
+            return false;
+        }
+
+        for (int row = 1; row <= 8; row++) {
+            for (int col = 1; col <= 8; col++) {
+                ChessPosition position = new ChessPosition(row, col);
+                ChessPiece piece = board.getPiece(position);
+                if (piece != null && piece.getTeamColor() == teamColor) {
+                    Collection<ChessMove> moves = validMoves(position);
+                    if (moves != null && !moves.isEmpty()) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
 
 
