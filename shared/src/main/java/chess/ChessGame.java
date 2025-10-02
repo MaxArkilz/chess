@@ -78,6 +78,7 @@ public class ChessGame {
             board.addPiece(startPos,null);
 
             if (move.getPromotionPiece() != null){
+                board.addPiece(endPos, null);
                 board.addPiece(endPos,new ChessPiece(movedPiece.getTeamColor(),move.getPromotionPiece()));
             }
 
@@ -99,7 +100,7 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         // check using valid moves
-        if (!validMoves(move.getStartPosition()).contains(move)){ throw new InvalidMoveException();}
+        if (validMoves(move.getStartPosition())==null || !validMoves(move.getStartPosition()).contains(move)){ throw new InvalidMoveException();}
         // switch turn
         currentTurn = (currentTurn == TeamColor.WHITE)? TeamColor.BLACK:TeamColor.WHITE;
 
@@ -188,6 +189,8 @@ public class ChessGame {
     public ChessBoard getBoard() {
         return this.board;
     }
+
+
 
     private TeamColor currentTurn;
     private ChessBoard board;

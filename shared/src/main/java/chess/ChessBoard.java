@@ -60,6 +60,7 @@ public class ChessBoard {
 
     }
 
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {
@@ -73,4 +74,36 @@ public class ChessBoard {
     public int hashCode() {
         return Arrays.deepHashCode(squares);
     }
+
+    /**
+     * toString method generated using Claude Sonnet for easier debugging using following prompt:
+     * "generate a toString method that returns pieces in the following format: r:[8,1], b:[8,2], ... , B:[1,7], R:[1,8]."
+     * generalized code was provided and edited to fit within ChessBoard
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (int row = 0; row < squares.length; row++) {
+            for (int col = 0; col < squares[row].length; col++) {
+                ChessPiece piece = squares[row][col];
+                if (piece != null) {
+                    char symbol = piece.getPieceType().toString().charAt(0);
+                    if (piece.getTeamColor() == ChessGame.TeamColor.BLACK) {
+                        symbol = Character.toLowerCase(symbol);
+                    } else {
+                        symbol = Character.toUpperCase(symbol);
+                    }
+                    // Append piece and 1-based position
+                    sb.append(symbol)
+                            .append(":[").append(row + 1).append(",").append(col + 1).append("], ");
+                }
+            }
+        }
+        // Remove trailing comma and space
+        if (sb.length() >= 2) {
+            sb.setLength(sb.length() - 2);
+        }
+        return sb.toString();
+    }
+
 }
