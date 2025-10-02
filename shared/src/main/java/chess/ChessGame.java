@@ -138,9 +138,11 @@ public class ChessGame {
      */
     public boolean isInCheck(TeamColor teamColor) {
         // run simulation on all opposing pieces if current board setup allows for king capture
+
         ChessPosition kingPos = findKing(teamColor);
         TeamColor opponent = (teamColor == TeamColor.WHITE) ? TeamColor.BLACK:TeamColor.WHITE;
 
+        // iterate through board, check if king can be captured
         for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
                 ChessPosition position = new ChessPosition(row,col);
@@ -165,23 +167,12 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
+
         if (!isInCheck(teamColor)) {
             return false;
         }
 
-        for (int row = 1; row <= 8; row++) {
-            for (int col = 1; col <= 8; col++) {
-                ChessPosition position = new ChessPosition(row, col);
-                ChessPiece piece = board.getPiece(position);
-                if (piece != null && piece.getTeamColor() == teamColor) {
-                    Collection<ChessMove> moves = validMoves(position);
-                    if (moves != null && !moves.isEmpty()) {
-                        return false;
-                    }
-                }
-            }
-        }
-        return true;
+        return boardIterate(teamColor);
     }
 
     /**
@@ -197,6 +188,10 @@ public class ChessGame {
             return false;
         }
 
+        return boardIterate(teamColor);
+    }
+
+    private boolean boardIterate(TeamColor teamColor) {
         for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
                 ChessPosition position = new ChessPosition(row, col);
