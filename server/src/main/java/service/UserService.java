@@ -1,14 +1,14 @@
 package service;
 
-import model.endPoints.*;
+import model.UserData;
 
 public class UserService {
-    public RegisterResult register(RegisterRequest registerRequest) {
+    public UserData register(UserData registerRequest) {
         return null;
     }
-    public LoginResult login(LoginRequest loginRequest){
+    public UserData.LoginResult login(UserData.LoginRequest loginRequest){
         return null;
     }
-    public void logout(LogoutRequest logoutRequest) {}
+    public void logout(UserData logoutRequest) {}
 
 }

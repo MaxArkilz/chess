@@ -1,3 +1,8 @@
 package model;
 
-public record UserData(String username, String password, String email) {}
+public record UserData() {
+    public record LoginRequest(String username, String password) {}
+
+    public record LoginResult(String username,String authToken){}
+}
+
