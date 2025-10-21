@@ -1,7 +1,6 @@
 package dataaccess;
 
-import model.AuthData;
-import model.UserData;
+import model.*;
 
 public interface DataAccess {
 //clear: A method for clearing all data from the database. This is used during testing.
