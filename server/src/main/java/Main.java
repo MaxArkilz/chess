@@ -6,9 +6,7 @@ import dataaccess.DataAccessMemory;
 public class Main {
     public static void main(String[] args) {
 
-        DataAccess dataAccess = new DataAccessMemory();
-        UserService service = new UserService(dataAccess);
-        ChessServer server = new ChessServer(service);
+        ChessServer server = new ChessServer();
         server.run(8080);
 
         System.out.println("♕ 240 Chess Server");
