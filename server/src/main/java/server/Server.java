@@ -1,21 +1,19 @@
 package server;
 
-import com.google.gson.Gson;
 import dataaccess.DataAccessMemory;
 import exception.ResponseException;
 import io.javalin.*;
 import io.javalin.http.Context;
 import model.UserData;
-import service.GameService;
 import service.UserService;
 
-public class ChessServer {
+public class Server {
 
     private final Javalin javalin;
     private final UserService userService;
 //    private final GameService gameService;
 
-    public ChessServer() {
+    public Server() {
 
         DataAccessMemory dao = new DataAccessMemory();
 

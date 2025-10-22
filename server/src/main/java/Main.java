@@ -1,12 +1,9 @@
-import server.ChessServer;
-import service.UserService;
-import dataaccess.DataAccess;
-import dataaccess.DataAccessMemory;
+import server.Server;
 
 public class Main {
     public static void main(String[] args) {
 
-        ChessServer server = new ChessServer();
+        Server server = new Server();
         server.run(8080);
 
         System.out.println("♕ 240 Chess Server");
