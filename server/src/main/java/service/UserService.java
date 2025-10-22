@@ -17,6 +17,9 @@ public class UserService {
 
     public UserData.LoginResult register(UserData.RegisterRequest regRequest) throws ResponseException{
 
+        if (regRequest.username() == null || regRequest.password() == null || regRequest.email() == null) {
+            throw new ResponseException(400, "Missing one field");
+        }
         var existing = dao.getUser(regRequest.username());
         if (existing != null) {
             throw new ResponseException(403, "Username already taken");
