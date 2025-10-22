@@ -7,7 +7,7 @@ public record UserData(String username, String password, String email) {
         return new LoginRequest(username, password);
     }
 
-    public static LoginResult result(String username,String authToken){
+    public static LoginResult result(String username){
         return new LoginResult(username, UUID.randomUUID().toString());
     }
 

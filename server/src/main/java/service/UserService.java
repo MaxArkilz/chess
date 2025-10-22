@@ -1,13 +1,37 @@
 package service;
 
+import dataaccess.DataAccess;
+import dataaccess.DataAccessException;
+import model.AuthData;
 import model.UserData;
 import exception.ResponseException;
 
+import java.util.UUID;
+
 public class UserService {
-    public UserData.RegisterRequest register(UserData.RegisterRequest registerRequest)throws ResponseException{
-        if (registerRequest.username() != null) {
-            throw new ResponseException(403);
+
+    private final DataAccess dao;
+
+    public UserService(DataAccess dao){
+        this.dao = dao;
+    }
+
+    public UserData.LoginResult register(UserData.RegisterRequest regRequest) throws ResponseException, DataAccessException {
+
+        var existing = dao.getUser(regRequest.username());
+        if (existing != null) {
+            throw new ResponseException(403, "Username already taken");
         }
+
+        var newUser = new UserData(regRequest.username(), regRequest.password(), regRequest.email());
+        dao.createUser(newUser);
+
+        var token = UUID.randomUUID().toString();
+        var auth = new AuthData(token, newUser.username());
+        dao.createAuth(auth);
+
+
+        return new UserData.LoginResult(newUser.username(), token);
     }
 
     public UserData login(UserData.LoginRequest loginRequest){
