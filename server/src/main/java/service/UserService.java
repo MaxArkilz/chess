@@ -1,7 +1,6 @@
 package service;
 
 import dataaccess.DataAccess;
-import dataaccess.DataAccessException;
 import model.AuthData;
 import model.UserData;
 import exception.ResponseException;
@@ -16,7 +15,7 @@ public class UserService {
         this.dao = dao;
     }
 
-    public UserData.LoginResult register(UserData.RegisterRequest regRequest) throws ResponseException, DataAccessException {
+    public UserData.LoginResult register(UserData.RegisterRequest regRequest) throws ResponseException{
 
         var existing = dao.getUser(regRequest.username());
         if (existing != null) {
@@ -29,7 +28,6 @@ public class UserService {
         var token = UUID.randomUUID().toString();
         var auth = new AuthData(token, newUser.username());
         dao.createAuth(auth);
-
 
         return new UserData.LoginResult(newUser.username(), token);
     }

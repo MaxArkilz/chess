@@ -1,6 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccessMemory;
 import exception.ResponseException;
 import io.javalin.*;
 import io.javalin.http.Context;
@@ -12,12 +13,14 @@ public class ChessServer {
 
     private final Javalin javalin;
     private final UserService userService;
-    private final GameService gameService;
+//    private final GameService gameService;
 
     public ChessServer() {
 
-        userService = new UserService();
-        gameService = new GameService();
+        DataAccessMemory dao = new DataAccessMemory();
+
+        userService = new UserService(dao);
+//        gameService = new GameService(dao);
 
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
@@ -35,8 +38,9 @@ public class ChessServer {
     }
 
     private void register(Context ctx) throws ResponseException {
-        var request = new Gson().fromJson(ctx.body(), UserData.class);
+        UserData.RegisterRequest request = ctx.bodyAsClass(UserData.RegisterRequest.class);
         var result = userService.register(request);
+        ctx.status(200).json(result);
 
     }
 }
