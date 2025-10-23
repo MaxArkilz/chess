@@ -41,12 +41,12 @@ public class DataAccessMemory implements DataAccess{
 
     @Override
     public GameData getGame(int gameID) {
-        return null;
+        return games.get(gameID);
     }
 
     @Override
     public Iterable<GameData> listGames() {
-        return null;
+        return games.values();
     }
 
     @Override
