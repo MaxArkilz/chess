@@ -52,12 +52,14 @@ public class GameService {
 
     public void joinGame(String authToken, GameData.JoinGameRequest request) {
         var auth = dao.getAuth(authToken);
+        if (auth == null) {
+            throw new ResponseException(401, "Error: unauthorized");}
+
         var game = dao.getGame(request.gameID());
         String username = auth.username();
         var playerColor = request.color();
 
-        if (auth == null) {
-            throw new ResponseException(401, "Error: unauthorized");}
+
         if (playerColor != ChessGame.TeamColor.WHITE && playerColor != ChessGame.TeamColor.BLACK) {
             throw new ResponseException(400, "Error: bad request");}
         if (game == null) {
