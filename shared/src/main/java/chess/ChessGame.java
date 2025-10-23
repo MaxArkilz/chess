@@ -65,7 +65,7 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece piece = board.getPiece(startPosition);
-        if (piece == null || board == null) return null;
+        if (piece == null || board == null) {return null;}
 
         Collection<ChessMove> possibleMoves = piece.pieceMoves(board,startPosition);
         List<ChessMove> legalMoves = new ArrayList<>();

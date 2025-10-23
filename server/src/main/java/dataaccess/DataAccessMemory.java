@@ -7,14 +7,14 @@ public class DataAccessMemory implements DataAccess{
     private final Map<String, UserData> users = new HashMap<>();
     private final Map<Integer, GameData> games = new HashMap<>();
     private final Map<String, AuthData> auths = new HashMap<>();
-    private int GameID = 1000;
+    private static int gameID = 1000;
 
     @Override
     public void clear() {
         users.clear();
         games.clear();
         auths.clear();
-        GameID = 1000;
+        gameID = 1000;
     }
 
     @Override
@@ -34,8 +34,8 @@ public class DataAccessMemory implements DataAccess{
 
     public int getGameID(){
 
-        int currentGameID = GameID;
-        GameID += 1;
+        int currentGameID = gameID;
+        gameID += 1;
         return currentGameID;
     }
 

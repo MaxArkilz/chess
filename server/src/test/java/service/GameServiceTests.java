@@ -1,6 +1,5 @@
 package service;
 
-import chess.ChessGame;
 import dataaccess.DataAccessMemory;
 import exception.ResponseException;
 import model.AuthData;
@@ -34,7 +33,7 @@ public class GameServiceTests {
 
     // list game success
     @Test
-    public void list_game_success() throws ResponseException {
+    public void listGameSuccess() throws ResponseException {
         dao.createGame(new GameData(1000, "yourMother", "", "Active Game", null));
         dao.createGame(new GameData(1001, null, null, "Empty Game", null));
 
@@ -46,7 +45,7 @@ public class GameServiceTests {
 
     // list game unauthorized error
     @Test
-    public void unauthorized_list_game() throws ResponseException{
+    public void unauthorizedListGame() throws ResponseException{
         String badToken = "666";
 
         ResponseException ex = Assertions.assertThrows(ResponseException.class, () -> gameService.listGames(badToken));
@@ -56,7 +55,7 @@ public class GameServiceTests {
 
     // create game success
     @Test
-    public void successful_game_creation() throws ResponseException {
+    public void successfulGameCreation() throws ResponseException {
         var request = new GameData.CreateGameRequest("Good luck, have fun");
         var result = gameService.createGame(momToken, request);
 
@@ -68,7 +67,7 @@ public class GameServiceTests {
     // create game bad request
 
     @Test
-    public void no_name_game() throws ResponseException {
+    public void noNameGame() throws ResponseException {
         var forgotNameRequest = new GameData.CreateGameRequest(null);
 
         ResponseException ex = Assertions.assertThrows(ResponseException.class, () -> gameService.createGame(momToken, forgotNameRequest));
@@ -76,7 +75,7 @@ public class GameServiceTests {
     }
     // create game unauthorized request
     @Test
-    public void create_game_unauthorized() {
+    public void createGameUnauthorized() {
         String badToken = "666";
         var request = new GameData.CreateGameRequest("Game");
 
@@ -85,7 +84,7 @@ public class GameServiceTests {
     }
     // join game success
     @Test
-    public void join_game_success() throws ResponseException {
+    public void joinGameSuccess() throws ResponseException {
         GameData game = new GameData(1002,"yourMother", null, "TheFaceOff", null);
         dao.createGame(game);
 
@@ -97,7 +96,7 @@ public class GameServiceTests {
     }
     // join game unauthorized failure
     @Test
-    public void join_game_unauthorized() {
+    public void joinGameUnauthorized() {
         var request = new GameData.JoinGameRequest("WHITE", 1003);
         String badToken = "666";
 
@@ -107,7 +106,7 @@ public class GameServiceTests {
 
     // join game no existing game
     @Test
-    public void join_game_no_game() {
+    public void joinGameNoGame() {
         var request = new GameData.JoinGameRequest("WHITE", 999);
 
         ResponseException ex = Assertions.assertThrows(ResponseException.class, () -> gameService.joinGame(momToken, request));
@@ -116,7 +115,7 @@ public class GameServiceTests {
 
     // join game color taken
     @Test
-    public void join_game_color_taken() {
+    public void joinGameColorTaken() {
         // Set up game where WHITE is taken
         GameData game = new GameData(1007, "yourMother", null, "YouShallNotPass", null);
         dao.createGame(game);
