@@ -150,16 +150,24 @@ public class ChessGame {
                 ChessPiece piece = board.getPiece(position);
 
                 if (piece != null && piece.getTeamColor() == opponent) {
-                    for (ChessMove move : piece.pieceMoves(board, position)){
-                        if (move.getEndPosition().equals(kingPos)){
-                            return true;
-                        }
+                    if (canCaptureKing(piece, position, kingPos)) {
+                        return true;
                     }
                 }
             }
         }
         return false;
     }
+
+    private boolean canCaptureKing(ChessPiece piece, ChessPosition fromPos, ChessPosition kingPos) {
+        for (ChessMove move : piece.pieceMoves(board, fromPos)){
+            if (move.getEndPosition().equals(kingPos)){
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     /**
      * Determines if the given team is in checkmate
