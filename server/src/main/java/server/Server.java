@@ -4,22 +4,26 @@ import dataaccess.DataAccessMemory;
 import exception.ResponseException;
 import io.javalin.*;
 import io.javalin.http.Context;
+import model.GameData;
 import model.UserData;
 import org.jetbrains.annotations.NotNull;
+import service.GameService;
 import service.UserService;
+
+import java.util.Map;
 
 public class Server {
 
     private final Javalin javalin;
     private final UserService userService;
-//    private final GameService gameService;
+    private final GameService gameService;
     private final DataAccessMemory dao;
 
     public Server() {
 
         this.dao = new DataAccessMemory();
         userService = new UserService(dao);
-//        gameService = new GameService(dao);
+        gameService = new GameService(dao);
 
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
@@ -28,6 +32,8 @@ public class Server {
         javalin.delete("/db", this::clear);
         javalin.post("/session", this::login);
         javalin.delete("/session", this::logout);
+        javalin.get("/game", this::listGames);
+        javalin.post("/game", this::createGame);
     }
 
     public int run(int desiredPort) {
@@ -57,8 +63,32 @@ public class Server {
     }
 
     private void logout(Context ctx) throws ResponseException {
-        String authToken = ctx.header("auth");
+        String authToken = ctx.header("authorization");
         userService.logout(authToken);
         ctx.status(200).json("{}");
+    }
+
+    private void listGames(Context ctx) throws ResponseException{
+        String authToken = ctx.header("authorization");
+        var result = gameService.listGames(authToken);
+        ctx.status(200).json(Map.of("games", result));
+    }
+
+    private void createGame(Context ctx) throws ResponseException{
+        String authToken = ctx.header("authorization");
+        GameData.CreateGameRequest request = ctx.bodyAsClass(GameData.CreateGameRequest.class);
+
+        if (request.gameName() == null || request.gameName().isBlank()){
+            throw new ResponseException(400, "Error: bad request");
+        }
+
+        var result = gameService.createGame(authToken, request);
+        ctx.status(200).json(result);
+
+    }
+
+    private void joinGame(Context ctx) throws ResponseException{
+        String authToken = ctx.header("authorization");
+
     }
 }

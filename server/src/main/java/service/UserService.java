@@ -40,7 +40,7 @@ public class UserService {
         var user = dao.getUser(loginRequest.username());
 
         if (user == null || !user.password().equals(loginRequest.password())){
-            throw new ResponseException(401,"Username or Password is incorrect");
+            throw new ResponseException(401,"Error: unauthorized");
         }
 
         var token = UUID.randomUUID().toString();
@@ -53,7 +53,7 @@ public class UserService {
     public void logout(String authToken) {
         var auth = dao.getAuth(authToken);
         if (auth == null) {
-            throw new ResponseException(401, "Invalid Auth Token");
+            throw new ResponseException(401, "Error: unauthorized");
         }
         dao.deleteAuth(authToken);
     }

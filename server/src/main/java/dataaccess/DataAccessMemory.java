@@ -1,21 +1,20 @@
 package dataaccess;
 import model.*;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class DataAccessMemory implements DataAccess{
 
     private final Map<String, UserData> users = new HashMap<>();
     private final Map<Integer, GameData> games = new HashMap<>();
     private final Map<String, AuthData> auths = new HashMap<>();
-    private final AtomicInteger nextGameID = new AtomicInteger(1);
+    private int GameID = 1000;
 
     @Override
     public void clear() {
         users.clear();
         games.clear();
         auths.clear();
-        nextGameID.set(1);
+        GameID = 1000;
     }
 
     @Override
@@ -26,6 +25,28 @@ public class DataAccessMemory implements DataAccess{
     @Override
     public UserData getUser(String username) {
         return users.get(username);
+    }
+
+    @Override
+    public void createGame(GameData game) {
+        games.put(game.gameID(), game);
+    }
+
+    public int getGameID(){
+
+        int currentGameID = GameID;
+        GameID += 1;
+        return currentGameID;
+    }
+
+    @Override
+    public GameData getGame(int gameID) {
+        return null;
+    }
+
+    @Override
+    public Iterable<GameData> listGames() {
+        return null;
     }
 
     @Override

@@ -19,9 +19,10 @@ public interface DataAccess {
     void createUser(UserData user);
     UserData getUser(String username);
 //
-//    void createGame(GameData game);
-//    GameData getGame(int gameID);
-//    Iterable<GameData> listGames();
+    void createGame(GameData game);
+    GameData getGame(int gameID);
+    Iterable<GameData> listGames();
+    int getGameID();
 //    void updateGame(GameData game);
 //
     void createAuth(AuthData auth);
