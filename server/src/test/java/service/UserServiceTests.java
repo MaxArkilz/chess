@@ -1,4 +1,4 @@
-package passoff.service;
+package service;
 
 import dataaccess.DataAccessMemory;
 import exception.ResponseException;
@@ -6,7 +6,6 @@ import model.UserData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import service.UserService;
 
 public class UserServiceTests {
 
@@ -29,7 +28,7 @@ public class UserServiceTests {
         Assertions.assertNotNull(result.authToken());
     }
 
-    // fail due to missing username
+    // registration fail due to missing username
     @Test
     public void register_missing_username() throws ResponseException {
         var request = UserData.register(null, "P@$$worD1", "ajb263@byu.edu");
@@ -41,5 +40,14 @@ public class UserServiceTests {
 
         Assertions.assertEquals(400, ex.getStatusCode());
 
+    }
+
+    // successful login
+    @Test
+    public void login_success() throws ResponseException {
+        var request = UserData.login("ajb263", "weakPassword1");
+        var result = userService.login(request);
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals("ajb263", result.username());
     }
 }
