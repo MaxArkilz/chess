@@ -1,6 +1,5 @@
 package server;
 
-import dataaccess.DataAccess;
 import dataaccess.DataAccessMemory;
 import exception.ResponseException;
 import io.javalin.*;
@@ -29,10 +28,6 @@ public class Server {
         javalin.delete("/db", this::clear);
         javalin.post("/session", this::login);
         javalin.delete("/session", this::logout);
-        javalin.exception(Exception.class, (ex, ctx) -> {
-            ctx.status(500);
-            ctx.json("{\"Internal Server Error\"}");
-        });
     }
 
     public int run(int desiredPort) {
@@ -62,6 +57,8 @@ public class Server {
     }
 
     private void logout(Context ctx) throws ResponseException {
-
+        String authToken = ctx.header("auth");
+        userService.logout(authToken);
+        ctx.status(200).json("{}");
     }
 }

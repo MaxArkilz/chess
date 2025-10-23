@@ -50,6 +50,12 @@ public class UserService {
         return new UserData.LoginResult(loginRequest.username(), token);
     }
 
-    public void logout(String logoutRequest) {}
+    public void logout(String authToken) {
+        var auth = dao.getAuth(authToken);
+        if (auth == null) {
+            throw new ResponseException(401, "Invalid Auth Token");
+        }
+        dao.deleteAuth(authToken);
+    }
 
 }

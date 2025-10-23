@@ -25,6 +25,6 @@ public interface DataAccess {
 //    void updateGame(GameData game);
 //
     void createAuth(AuthData auth);
-//    AuthData getAuth(String token);
-//    void deleteAuth(String token);
+    AuthData getAuth(String token);
+    void deleteAuth(String token);
 }

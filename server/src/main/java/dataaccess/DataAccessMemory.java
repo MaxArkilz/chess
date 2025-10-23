@@ -33,5 +33,15 @@ public class DataAccessMemory implements DataAccess{
         auths.put(auth.authToken(), auth);
     }
 
+    @Override
+    public AuthData getAuth(String token) {
+        return auths.get(token);
+    }
+
+    @Override
+    public void deleteAuth(String token) {
+        auths.remove(token);
+    }
+
 
 }
