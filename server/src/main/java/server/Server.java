@@ -4,6 +4,7 @@ import dataaccess.DataAccessMemory;
 import exception.ResponseException;
 import io.javalin.*;
 import io.javalin.http.Context;
+import io.javalin.json.JavalinGson;
 import model.GameData;
 import model.UserData;
 import org.jetbrains.annotations.NotNull;
@@ -25,9 +26,16 @@ public class Server {
         userService = new UserService(dao);
         gameService = new GameService(dao);
 
-        javalin = Javalin.create(config -> config.staticFiles.add("web"));
+        javalin = Javalin.create(config -> {
+            config.jsonMapper(new JavalinGson());
+            config.staticFiles.add("/web");
+        });
 
         // Register your endpoints and exception handlers here.
+        javalin.exception(ResponseException.class, ((e, context) -> {
+            context.status(e.getStatusCode());
+            context.json(Map.of("message", "Error: " + e.getMessage()));
+        } ));
         javalin.post("/user", this::register);
         javalin.delete("/db", this::clear);
         javalin.post("/session", this::login);
@@ -35,6 +43,7 @@ public class Server {
         javalin.get("/game", this::listGames);
         javalin.post("/game", this::createGame);
         javalin.put("/game", this::joinGame);
+
     }
 
     public int run(int desiredPort) {
