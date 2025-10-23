@@ -34,6 +34,7 @@ public class Server {
         javalin.delete("/session", this::logout);
         javalin.get("/game", this::listGames);
         javalin.post("/game", this::createGame);
+        javalin.put("/game", this::joinGame);
     }
 
     public int run(int desiredPort) {
@@ -77,11 +78,6 @@ public class Server {
     private void createGame(Context ctx) throws ResponseException{
         String authToken = ctx.header("authorization");
         GameData.CreateGameRequest request = ctx.bodyAsClass(GameData.CreateGameRequest.class);
-
-        if (request.gameName() == null || request.gameName().isBlank()){
-            throw new ResponseException(400, "Error: bad request");
-        }
-
         var result = gameService.createGame(authToken, request);
         ctx.status(200).json(result);
 
@@ -89,6 +85,9 @@ public class Server {
 
     private void joinGame(Context ctx) throws ResponseException{
         String authToken = ctx.header("authorization");
+        GameData.JoinGameRequest request = ctx.bodyAsClass(GameData.JoinGameRequest.class);
+        gameService.joinGame(authToken, request);
+        ctx.status(200).json("{}");
 
     }
 }
