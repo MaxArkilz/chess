@@ -7,5 +7,5 @@ public record GameData(int gameID, String whiteUsername, String blackUsername, S
 
     public record CreateGameRequest(String gameName) {}
     public record CreateGameResponse(int gameID) {}
-    public record JoinGameRequest(String color, int gameID) {}
+    public record JoinGameRequest(ChessGame.TeamColor color, int gameID) {}
 }

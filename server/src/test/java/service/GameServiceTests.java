@@ -1,5 +1,6 @@
 package service;
 
+import chess.ChessGame;
 import dataaccess.DataAccessMemory;
 import exception.ResponseException;
 import model.AuthData;
@@ -88,7 +89,7 @@ public class GameServiceTests {
         GameData game = new GameData(1002,"yourMother", null, "TheFaceOff", null);
         dao.createGame(game);
 
-        var request = new GameData.JoinGameRequest("BLACK", 1002);
+        var request = new GameData.JoinGameRequest(ChessGame.TeamColor.BLACK, 1002);
         gameService.joinGame(dadToken, request);
 
         GameData updatedGame = dao.getGame(1002);
@@ -97,7 +98,7 @@ public class GameServiceTests {
     // join game unauthorized failure
     @Test
     public void join_game_unauthorized() {
-        var request = new GameData.JoinGameRequest("WHITE", 1003);
+        var request = new GameData.JoinGameRequest(ChessGame.TeamColor.WHITE, 1003);
         String badToken = "666";
 
         ResponseException ex = Assertions.assertThrows(ResponseException.class, () -> gameService.joinGame(badToken, request));
@@ -107,7 +108,7 @@ public class GameServiceTests {
     // join game no existing game
     @Test
     public void join_game_no_game() {
-        var request = new GameData.JoinGameRequest("WHITE", 999);
+        var request = new GameData.JoinGameRequest(ChessGame.TeamColor.WHITE, 999);
 
         ResponseException ex = Assertions.assertThrows(ResponseException.class, () -> gameService.joinGame(momToken, request));
         Assertions.assertEquals(400, ex.getStatusCode());
@@ -120,7 +121,7 @@ public class GameServiceTests {
         GameData game = new GameData(1007, "yourMother", null, "YouShallNotPass", null);
         dao.createGame(game);
 
-        var request = new GameData.JoinGameRequest("WHITE", 1007);
+        var request = new GameData.JoinGameRequest(ChessGame.TeamColor.WHITE, 1007);
 
         ResponseException ex = Assertions.assertThrows(ResponseException.class, () -> gameService.joinGame(dadToken, request));
         Assertions.assertEquals(403, ex.getStatusCode());

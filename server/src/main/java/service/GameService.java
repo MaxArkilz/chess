@@ -1,5 +1,6 @@
 package service;
 
+import chess.ChessGame;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessMemory;
 import exception.ResponseException;
@@ -53,23 +54,20 @@ public class GameService {
         var auth = dao.getAuth(authToken);
         var game = dao.getGame(request.gameID());
         String username = auth.username();
-        String playerColor = request.color();
+        var playerColor = request.color();
 
-        if (playerColor == null){
-            playerColor = "WHITE";
-        }
         if (auth == null) {
             throw new ResponseException(401, "Error: unauthorized");}
-        if (!playerColor.equals("WHITE") && !playerColor.equals("BLACK")) {
+        if (playerColor != ChessGame.TeamColor.WHITE && playerColor != ChessGame.TeamColor.BLACK) {
             throw new ResponseException(400, "Error: bad request");}
         if (game == null) {
             throw new ResponseException(400, "Error: game not found");}
 
-        if (playerColor.equals("WHITE") && game.whiteUsername() != null || playerColor.equals("BLACK") && game.blackUsername() != null){
+        if (playerColor == ChessGame.TeamColor.WHITE && game.whiteUsername() != null || playerColor == ChessGame.TeamColor.BLACK && game.blackUsername() != null){
             throw new ResponseException(403, "Error: already taken");}
 
         GameData updatedGame;
-        if (playerColor.equals("WHITE")) {
+        if (playerColor == ChessGame.TeamColor.WHITE) {
             updatedGame = new GameData(game.gameID(), username, game.blackUsername(), game.gameName(), game.game());
         } else {
             updatedGame = new GameData(game.gameID(), game.whiteUsername(), username, game.gameName(), game.game());}
