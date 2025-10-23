@@ -1,5 +1,6 @@
 package server;
 
+import com.google.gson.Gson;
 import dataaccess.DataAccessMemory;
 import exception.ResponseException;
 import io.javalin.*;
@@ -94,7 +95,9 @@ public class Server {
 
     private void joinGame(Context ctx) throws ResponseException{
         String authToken = ctx.header("authorization");
-        GameData.JoinGameRequest request = ctx.bodyAsClass(GameData.JoinGameRequest.class);
+        var serializer = new Gson();
+        GameData.JoinGameRequest request = serializer.fromJson(ctx.body(), GameData.JoinGameRequest.class);
+
         gameService.joinGame(authToken, request);
         ctx.status(200).json("{}");
 
