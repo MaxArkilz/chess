@@ -15,7 +15,8 @@ public class GameServiceTests {
 
     private GameService gameService;
     private DataAccessMemory dao;
-    private String validToken = "123-456-789";
+    private String momToken = "123-456-789";
+    private String dadToken = "987-654-321";
 
     @BeforeEach
     public void setup() {
@@ -24,7 +25,9 @@ public class GameServiceTests {
         gameService = new GameService(dao);
 
         dao.createUser(new UserData("yourMother", "qwerty1!", "mrsamazing@gmail.com"));
-        dao.createAuth(new AuthData(validToken, "yourMother"));
+        dao.createAuth(new AuthData(momToken, "yourMother"));
+        dao.createUser(new UserData("yourFather", "password", "creativeemail@gmail.com"));
+        dao.createAuth(new AuthData("987-654-321","yourFather"));
 
     }
 
@@ -34,7 +37,7 @@ public class GameServiceTests {
         dao.createGame(new GameData(1000, "yourMother", "", "Active Game", null));
         dao.createGame(new GameData(1001, null, null, "Empty Game", null));
 
-        List<GameData> games = gameService.listGames(validToken);
+        List<GameData> games = gameService.listGames(momToken);
 
         Assertions.assertNotNull(games);
         Assertions.assertEquals(2, games.size());
@@ -54,7 +57,7 @@ public class GameServiceTests {
     @Test
     public void successful_game_creation() throws ResponseException {
         var request = new GameData.CreateGameRequest("Good luck, have fun");
-        var result = gameService.createGame(validToken, request);
+        var result = gameService.createGame(momToken, request);
 
         GameData newGame = dao.getGame(result.gameID());
         Assertions.assertTrue(result.gameID() >= 1000);
@@ -67,7 +70,7 @@ public class GameServiceTests {
     public void no_name_game() throws ResponseException {
         var forgotNameRequest = new GameData.CreateGameRequest(null);
 
-        ResponseException ex = Assertions.assertThrows(ResponseException.class, () -> gameService.createGame(validToken, forgotNameRequest));
+        ResponseException ex = Assertions.assertThrows(ResponseException.class, () -> gameService.createGame(momToken, forgotNameRequest));
         Assertions.assertEquals(400, ex.getStatusCode());
     }
     // create game unauthorized request
@@ -85,16 +88,41 @@ public class GameServiceTests {
         GameData game = new GameData(1002,"yourMother", null, "TheFaceOff", null);
         dao.createGame(game);
 
-        dao.createUser(new UserData("yourFather", "password", "creativeemail@gmail.com"));
-        dao.createAuth(new AuthData("987-654-321","yourFather"));
-
         var request = new GameData.JoinGameRequest("BLACK", 1002);
-        gameService.joinGame("987-654-321", request);
+        gameService.joinGame(dadToken, request);
 
         GameData updatedGame = dao.getGame(1002);
         Assertions.assertEquals("yourFather", updatedGame.blackUsername());
     }
     // join game unauthorized failure
+    @Test
+    public void join_game_unauthorized() {
+        var request = new GameData.JoinGameRequest("WHITE", 1003);
+        String badToken = "666";
+
+        ResponseException ex = Assertions.assertThrows(ResponseException.class, () -> gameService.joinGame(badToken, request));
+        Assertions.assertEquals(401, ex.getStatusCode());
+    }
+
     // join game no existing game
+    @Test
+    public void join_game_no_game() {
+        var request = new GameData.JoinGameRequest("WHITE", 999);
+
+        ResponseException ex = Assertions.assertThrows(ResponseException.class, () -> gameService.joinGame(momToken, request));
+        Assertions.assertEquals(400, ex.getStatusCode());
+    }
+
     // join game color taken
+    @Test
+    public void join_game_color_taken() {
+        // Set up game where WHITE is taken
+        GameData game = new GameData(1007, "yourMother", null, "YouShallNotPass", null);
+        dao.createGame(game);
+
+        var request = new GameData.JoinGameRequest("WHITE", 1007);
+
+        ResponseException ex = Assertions.assertThrows(ResponseException.class, () -> gameService.joinGame(dadToken, request));
+        Assertions.assertEquals(403, ex.getStatusCode());
+    }
 }
