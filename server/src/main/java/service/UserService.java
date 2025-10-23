@@ -39,6 +39,9 @@ public class UserService {
     public UserData.LoginResult login(@NotNull UserData.LoginRequest loginRequest){
         var user = dao.getUser(loginRequest.username());
 
+        if (loginRequest.username() == null || loginRequest.password() == null){
+            throw new ResponseException(400, "Error: bad request");
+        }
         if (user == null || !user.password().equals(loginRequest.password())){
             throw new ResponseException(401,"Error: unauthorized");
         }
