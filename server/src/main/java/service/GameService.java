@@ -66,7 +66,10 @@ public class GameService {
         if (game == null) {
             throw new ResponseException(400, "Error: game not found");}
 
-        if (request.playerColor().equals("WHITE") && game.whiteUsername() != null || request.playerColor().equals("BLACK") && game.blackUsername() != null){
+        if ((request.playerColor().equals("WHITE")
+                && game.whiteUsername() != null)
+                || (request.playerColor().equals("BLACK")
+                && game.blackUsername() != null)){
             throw new ResponseException(403, "Error: already taken");}
 
         GameData updatedGame;

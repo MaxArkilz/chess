@@ -52,7 +52,16 @@ public class ChessBoard {
             squares[6][i] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
         }
 
-        ChessPiece.PieceType[] backRow = {ChessPiece.PieceType.ROOK, ChessPiece.PieceType.KNIGHT, ChessPiece.PieceType.BISHOP, ChessPiece.PieceType.QUEEN, ChessPiece.PieceType.KING, ChessPiece.PieceType.BISHOP, ChessPiece.PieceType.KNIGHT, ChessPiece.PieceType.ROOK};
+        ChessPiece.PieceType[] backRow = {
+                ChessPiece.PieceType.ROOK,
+                ChessPiece.PieceType.KNIGHT,
+                ChessPiece.PieceType.BISHOP,
+                ChessPiece.PieceType.QUEEN,
+                ChessPiece.PieceType.KING,
+                ChessPiece.PieceType.BISHOP,
+                ChessPiece.PieceType.KNIGHT,
+                ChessPiece.PieceType.ROOK
+        };
         for (int i = 0; i <= 7; i++){
             squares[0][i] = new ChessPiece(ChessGame.TeamColor.WHITE, backRow[i]);
             squares[7][i] = new ChessPiece(ChessGame.TeamColor.BLACK,backRow[i]);

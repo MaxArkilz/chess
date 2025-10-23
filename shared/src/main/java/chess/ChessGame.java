@@ -137,24 +137,30 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        // run simulation on all opposing pieces if current board setup allows for king capture
-
         ChessPosition kingPos = findKing(teamColor);
-        TeamColor opponent = (teamColor == TeamColor.WHITE) ? TeamColor.BLACK:TeamColor.WHITE;
+        TeamColor opponent = (teamColor == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
 
-        // iterate through board, check if king can be captured
+        // Iterate board positions
         for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
-                ChessPosition position = new ChessPosition(row,col);
-                ChessPiece piece = board.getPiece(position);
+                ChessPosition pos = new ChessPosition(row, col);
+                ChessPiece piece = board.getPiece(pos);
 
-                if (piece != null && piece.getTeamColor() == opponent) {
-                    for (ChessMove move : piece.pieceMoves(board, position)){
-                        if (move.getEndPosition().equals(kingPos)){
-                            return true;
-                        }
-                    }
+                // skip empty squares or pieces on current team
+                if (piece == null || piece.getTeamColor() != opponent) {}
+
+                if (canCaptureKing(piece, pos, kingPos)) {
+                    return true;
                 }
+            }
+        }
+        return false;
+    }
+
+    private boolean canCaptureKing(ChessPiece piece, ChessPosition fromPos, ChessPosition kingPos) {
+        for (ChessMove move : piece.pieceMoves(board, fromPos)) {
+            if (move.getEndPosition().equals(kingPos)) {
+                return true;
             }
         }
         return false;

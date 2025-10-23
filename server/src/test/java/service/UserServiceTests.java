@@ -26,7 +26,7 @@ public class UserServiceTests {
 
     // Successful registration
     @Test
-    public void register_success() throws ResponseException {
+    public void registerSuccess() throws ResponseException {
         var request = UserData.register("ajb263", "P@$$worD1","ajb263@byu.edu");
         var result = userService.register(request);
         Assertions.assertNotNull(result);
@@ -36,7 +36,7 @@ public class UserServiceTests {
 
     // registration fail due to missing username
     @Test
-    public void register_missing_username() throws ResponseException {
+    public void registerMissingUsername() throws ResponseException {
         var request = UserData.register(null, "P@$$worD1", "ajb263@byu.edu");
         ResponseException ex = Assertions.assertThrows(
                 ResponseException.class,
@@ -50,7 +50,7 @@ public class UserServiceTests {
 
     // successful login
     @Test
-    public void login_success() throws ResponseException {
+    public void loginSuccess() throws ResponseException {
         var request = UserData.login("theFirstUser", "weakPassword1");
         var result = userService.login(request);
         Assertions.assertNotNull(result);
@@ -60,7 +60,7 @@ public class UserServiceTests {
 
     // incorrect username login
     @Test
-    public void login_failure_username() throws ResponseException {
+    public void loginFailureUsername() throws ResponseException {
         var request = UserData.login("theFirstHacker", "weakPassword1");
         ResponseException ex = Assertions.assertThrows(
                 ResponseException.class,
@@ -73,7 +73,7 @@ public class UserServiceTests {
 
     // logout success
     @Test
-    public void logout_success() throws ResponseException {
+    public void logoutSuccess() throws ResponseException {
 
         String validToken = "123-456-789";
         userService.logout(validToken);
@@ -81,7 +81,7 @@ public class UserServiceTests {
     }
 
     @Test
-    public void logout_auth_failure() throws ResponseException {
+    public void logoutAuthFailure() throws ResponseException {
         String invalidToken = "312-465-987";
         ResponseException ex = Assertions.assertThrows(ResponseException.class, () -> userService.logout(invalidToken));
         Assertions.assertEquals(401, ex.getStatusCode());
