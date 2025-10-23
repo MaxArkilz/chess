@@ -41,8 +41,35 @@ public class GameServiceTests {
     }
 
     // list game unauthorized error
+    @Test
+    public void unauthorized_list_game() throws ResponseException{
+        String badToken = "666";
+
+        ResponseException ex = Assertions.assertThrows(ResponseException.class, () -> gameService.listGames(badToken));
+
+        Assertions.assertEquals(401, ex.getStatusCode());
+    }
+
     // create game success
+    @Test
+    public void successful_game_creation() throws ResponseException {
+        var request = new GameData.CreateGameRequest("Good luck, have fun");
+        var result = gameService.createGame(validToken, request);
+
+        GameData newGame = dao.getGame(result.gameID());
+        Assertions.assertTrue(result.gameID() >= 1000);
+        Assertions.assertEquals("Good luck, have fun", newGame.gameName());
+
+    }
     // create game bad request
+
+    @Test
+    public void no_name_game() throws ResponseException {
+        var forgotNameRequest = new GameData.CreateGameRequest("");
+
+        ResponseException ex = Assertions.assertThrows(ResponseException.class, () -> gameService.createGame(validToken, forgotNameRequest));
+        Assertions.assertEquals(400, ex.getStatusCode());
+    }
     // create game unauthorized request
     // join game success
     // join game unauthorized failure
