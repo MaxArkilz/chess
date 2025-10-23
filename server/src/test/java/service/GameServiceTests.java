@@ -65,13 +65,35 @@ public class GameServiceTests {
 
     @Test
     public void no_name_game() throws ResponseException {
-        var forgotNameRequest = new GameData.CreateGameRequest("");
+        var forgotNameRequest = new GameData.CreateGameRequest(null);
 
         ResponseException ex = Assertions.assertThrows(ResponseException.class, () -> gameService.createGame(validToken, forgotNameRequest));
         Assertions.assertEquals(400, ex.getStatusCode());
     }
     // create game unauthorized request
+    @Test
+    public void create_game_unauthorized() {
+        String badToken = "666";
+        var request = new GameData.CreateGameRequest("Game");
+
+        ResponseException ex = Assertions.assertThrows(ResponseException.class, () -> gameService.createGame(badToken, request));
+        Assertions.assertEquals(401, ex.getStatusCode());
+    }
     // join game success
+    @Test
+    public void join_game_success() throws ResponseException {
+        GameData game = new GameData(1002,"yourMother", null, "TheFaceOff", null);
+        dao.createGame(game);
+
+        dao.createUser(new UserData("yourFather", "password", "creativeemail@gmail.com"));
+        dao.createAuth(new AuthData("987-654-321","yourFather"));
+
+        var request = new GameData.JoinGameRequest("BLACK", 1002);
+        gameService.joinGame("987-654-321", request);
+
+        GameData updatedGame = dao.getGame(1002);
+        Assertions.assertEquals("yourFather", updatedGame.blackUsername());
+    }
     // join game unauthorized failure
     // join game no existing game
     // join game color taken
