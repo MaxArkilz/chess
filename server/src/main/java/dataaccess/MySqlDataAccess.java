@@ -31,9 +31,8 @@ public class MySqlDataAccess {
             }
         } catch (SQLException ex) {
             throw new ResponseException(
-                    500,
-                    String.format("Unable to configure database: %s", ex.getMessage()),
-                    ResponseException.Code.ServerError);
+                    ResponseException.Code.ServerError,
+                    String.format("Unable to configure database: %s", ex.getMessage()));
         }
 
     }
