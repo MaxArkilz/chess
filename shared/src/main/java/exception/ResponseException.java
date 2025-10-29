@@ -13,6 +13,8 @@ public class ResponseException extends RuntimeException{
     public enum Code {
         ServerError,
         ClientError,
+        Unauthorized,
+        Forbidden
     }
 
     public ResponseException(Code statusCode, String message) {
@@ -26,7 +28,7 @@ public class ResponseException extends RuntimeException{
     }
 
     public String toJson() {
-        return new Gson().toJson(Map.of("message", getMessage(), "status", code));
+        return new Gson().toJson(Map.of("message", getMessage(), "status", statusCode));
     }
 
     public static ResponseException fromJson(String json) {
@@ -52,6 +54,8 @@ public class ResponseException extends RuntimeException{
         return switch (statusCode) {
             case ServerError -> 500;
             case ClientError -> 400;
+            case Forbidden -> 403;
+            case Unauthorized -> 401;
         };
     }
 

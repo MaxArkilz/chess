@@ -19,11 +19,11 @@ public class UserService {
     public UserData.LoginResult register(@NotNull UserData.RegisterRequest regRequest) throws ResponseException{
 
         if (regRequest.username() == null || regRequest.password() == null || regRequest.email() == null) {
-            throw new ResponseException(400, "Missing one field");
+            throw new ResponseException(ResponseException.Code.ClientError, "Missing one field");
         }
         var existing = dao.getUser(regRequest.username());
         if (existing != null) {
-            throw new ResponseException(403, "Username already taken");
+            throw new ResponseException(ResponseException.Code.Forbidden, "Username already taken");
         }
 
         var newUser = new UserData(regRequest.username(), regRequest.password(), regRequest.email());
@@ -40,10 +40,10 @@ public class UserService {
         var user = dao.getUser(loginRequest.username());
 
         if (loginRequest.username() == null || loginRequest.password() == null){
-            throw new ResponseException(400, "Error: bad request");
+            throw new ResponseException(ResponseException.Code.ClientError, "Error: bad request");
         }
         if (user == null || !user.password().equals(loginRequest.password())){
-            throw new ResponseException(401,"Error: unauthorized");
+            throw new ResponseException(ResponseException.Code.Forbidden,"Error: unauthorized");
         }
 
         var token = UUID.randomUUID().toString();
@@ -56,7 +56,7 @@ public class UserService {
     public void logout(String authToken) {
         var auth = dao.getAuth(authToken);
         if (auth == null) {
-            throw new ResponseException(401, "Error: unauthorized");
+            throw new ResponseException(ResponseException.Code.Forbidden, "Error: unauthorized");
         }
         dao.deleteAuth(authToken);
     }

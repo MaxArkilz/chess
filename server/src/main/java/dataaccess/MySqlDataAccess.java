@@ -1,12 +1,18 @@
 package dataaccess;
 
 import exception.ResponseException;
+import model.AuthData;
+import model.GameData;
+import model.UserData;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public class MySqlDataAccess {
+public class MySqlDataAccess implements DataAccess{
 
+    public MySqlDataAccess() throws ResponseException, DataAccessException {
+        configureDatabase();
+    }
 
     private final String[] createStatements = {
             """
@@ -21,7 +27,7 @@ public class MySqlDataAccess {
 """
     };
     
-    private void configureDatabase() throws DataAccessException, SQLException {
+    private void configureDatabase() throws DataAccessException{
         DatabaseManager.createDatabase();
         try (Connection conn = DatabaseManager.getConnection()) {
             for (String statement : createStatements) {
@@ -34,6 +40,56 @@ public class MySqlDataAccess {
                     ResponseException.Code.ServerError,
                     String.format("Unable to configure database: %s", ex.getMessage()));
         }
+
+    }
+
+    @Override
+    public void clear() {
+
+    }
+
+    @Override
+    public void createUser(UserData user) {
+
+    }
+
+    @Override
+    public UserData getUser(String username) {
+        return null;
+    }
+
+    @Override
+    public void createGame(GameData game) {
+
+    }
+
+    @Override
+    public GameData getGame(int gameID) {
+        return null;
+    }
+
+    @Override
+    public Iterable<GameData> listGames() {
+        return null;
+    }
+
+    @Override
+    public int getGameID() {
+        return 0;
+    }
+
+    @Override
+    public void createAuth(AuthData auth) {
+
+    }
+
+    @Override
+    public AuthData getAuth(String token) {
+        return null;
+    }
+
+    @Override
+    public void deleteAuth(String token) {
 
     }
 }
