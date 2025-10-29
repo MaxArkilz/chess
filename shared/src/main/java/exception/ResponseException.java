@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ResponseException extends RuntimeException{
-    private final int statusCode;
+    private final Code statusCode;
     private final String message;
 
 
@@ -15,16 +15,13 @@ public class ResponseException extends RuntimeException{
         ClientError,
     }
 
-    final private Code code;
-
-    public ResponseException(int statusCode, String message, Code code) {
+    public ResponseException(Code statusCode, String message) {
         super("Error " + statusCode + ": " + message);
         this.statusCode = statusCode;
         this.message = message;
-        this.code = code;
     }
 
-    public int getStatusCode() {
+    public Code getStatusCode() {
         return statusCode;
     }
 
@@ -40,7 +37,7 @@ public class ResponseException extends RuntimeException{
     }
 
     public Code code() {
-        return code;
+        return statusCode;
     }
 
     public static Code fromHttpStatusCode(int httpStatusCode) {
@@ -52,7 +49,7 @@ public class ResponseException extends RuntimeException{
     }
 
     public int toHttpStatusCode() {
-        return switch (code) {
+        return switch (statusCode) {
             case ServerError -> 500;
             case ClientError -> 400;
         };

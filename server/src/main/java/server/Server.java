@@ -34,7 +34,7 @@ public class Server {
 
         // Register your endpoints and exception handlers here.
         javalin.exception(ResponseException.class, ((e, context) -> {
-            context.status(e.getStatusCode());
+            context.status(e.toHttpStatusCode());
             context.json(Map.of("message", "Error: " + e.getMessage()));
         } ));
         javalin.post("/user", this::register);
