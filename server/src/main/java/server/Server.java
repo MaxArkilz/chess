@@ -1,7 +1,10 @@
 package server;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccess;
+import dataaccess.DataAccessException;
 import dataaccess.DataAccessMemory;
+import dataaccess.MySqlDataAccess;
 import exception.ResponseException;
 import io.javalin.*;
 import io.javalin.http.Context;
@@ -19,24 +22,35 @@ public class Server {
     private final Javalin javalin;
     private final UserService userService;
     private final GameService gameService;
-    private final DataAccessMemory dao;
+    private final DataAccess dao;
+//    private final MySqlDataAccess dao;
+
 
     public Server() {
+        this(new DataAccessMemory());
+    }
 
-        this.dao = new DataAccessMemory();
-        userService = new UserService(dao);
-        gameService = new GameService(dao);
+    public Server(DataAccess dao) {
+        this.dao = dao;
+        this.userService = new UserService(dao);
+        this.gameService = new GameService(dao);
+        this.javalin = makeJavalin();
+        registerEndpoints();
+    }
 
-        javalin = Javalin.create(config -> {
+    private Javalin makeJavalin() {
+        return Javalin.create(config -> {
             config.jsonMapper(new JavalinGson());
             config.staticFiles.add("/web");
         });
+    }
 
-        // Register your endpoints and exception handlers here.
+    private void registerEndpoints() {
+        // Same registration as before
         javalin.exception(ResponseException.class, ((e, context) -> {
             context.status(e.toHttpStatusCode());
             context.json(Map.of("message", "Error: " + e.getMessage()));
-        } ));
+        }));
         javalin.post("/user", this::register);
         javalin.delete("/db", this::clear);
         javalin.post("/session", this::login);
@@ -44,9 +58,7 @@ public class Server {
         javalin.get("/game", this::listGames);
         javalin.post("/game", this::createGame);
         javalin.put("/game", this::joinGame);
-
     }
-
     public int run(int desiredPort) {
         javalin.start(desiredPort);
         return javalin.port();

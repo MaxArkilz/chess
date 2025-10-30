@@ -15,14 +15,14 @@ public class GameService {
 
     private final DataAccess dao;
 
-    public GameService(DataAccessMemory dao) {
+    public GameService(DataAccess dao) {
         this.dao = dao;
     }
 
     public List<GameData> listGames(String authToken) {
         var auth = dao.getAuth(authToken);
         if (auth == null) {
-            throw new ResponseException(401, "Error: unauthorized");
+            throw new ResponseException(ResponseException.Code.Unauthorized, "Error: unauthorized");
         }
 
         Iterable<GameData> games = dao.listGames();
@@ -36,11 +36,11 @@ public class GameService {
     public GameData.CreateGameResponse createGame(String authToken, GameData.CreateGameRequest request) {
         var auth = dao.getAuth(authToken);
         if (auth == null) {
-            throw new ResponseException(401, "Error: unauthorized");
+            throw new ResponseException(ResponseException.Code.Unauthorized, "Error: unauthorized");
         }
 
         if (request.gameName() == null){
-            throw new ResponseException(400, "Error: bad request");
+            throw new ResponseException(ResponseException.Code.ClientError, "Error: bad request");
         }
 
         int newGameID = dao.getGameID();
@@ -53,24 +53,24 @@ public class GameService {
     public void joinGame(String authToken, GameData.JoinGameRequest request) {
         var auth = dao.getAuth(authToken);
         if (auth == null) {
-            throw new ResponseException(401, "Error: unauthorized");}
+            throw new ResponseException(ResponseException.Code.Unauthorized, "Error: unauthorized");}
         if (request.playerColor() == null){
-            throw new ResponseException(400, "Error: bad request");}
+            throw new ResponseException(ResponseException.Code.ClientError, "Error: bad request");}
 
         var game = dao.getGame(request.gameID());
         String username = auth.username();
 
 
         if (!request.playerColor().equals("WHITE") && !request.playerColor().equals("BLACK")) {
-            throw new ResponseException(400, "Error: bad request");}
+            throw new ResponseException(ResponseException.Code.ClientError, "Error: bad request");}
         if (game == null) {
-            throw new ResponseException(400, "Error: game not found");}
+            throw new ResponseException(ResponseException.Code.ClientError, "Error: game not found");}
 
         if ((request.playerColor().equals("WHITE")
                 && game.whiteUsername() != null)
                 || (request.playerColor().equals("BLACK")
                 && game.blackUsername() != null)){
-            throw new ResponseException(403, "Error: already taken");}
+            throw new ResponseException(ResponseException.Code.Forbidden, "Error: already taken");}
 
         GameData updatedGame;
         if (request.playerColor().equals("WHITE")) {

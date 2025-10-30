@@ -17,12 +17,12 @@ public class MySqlDataAccess implements DataAccess{
     private final String[] createStatements = {
             """
             CREATE TABLE IF NOT EXISTS game(
-            'id' int NOT NULL AUTO_INCREMENT,
-            'name' varchar(256) NOT NULL,
-            'playerColor' ENUM('WHITE', 'BLACK') DEFAULT 'WHITE',
-            'json' TEXT DEFAULT NULL,
-            PRIMARY KEY ('id'),
-            INDEX(name)
+            `id` int NOT NULL AUTO_INCREMENT,
+            `name` varchar(256) NOT NULL,
+            `playerColor` ENUM('WHITE', 'BLACK') DEFAULT 'WHITE',
+            `json` JSON DEFAULT NULL,
+            PRIMARY KEY (`id`),
+            INDEX(`name`)
             )
 """
     };

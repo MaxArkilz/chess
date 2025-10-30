@@ -43,7 +43,7 @@ public class UserService {
             throw new ResponseException(ResponseException.Code.ClientError, "Error: bad request");
         }
         if (user == null || !user.password().equals(loginRequest.password())){
-            throw new ResponseException(ResponseException.Code.Forbidden,"Error: unauthorized");
+            throw new ResponseException(ResponseException.Code.Unauthorized,"Error: unauthorized");
         }
 
         var token = UUID.randomUUID().toString();
@@ -56,7 +56,7 @@ public class UserService {
     public void logout(String authToken) {
         var auth = dao.getAuth(authToken);
         if (auth == null) {
-            throw new ResponseException(ResponseException.Code.Forbidden, "Error: unauthorized");
+            throw new ResponseException(ResponseException.Code.Unauthorized, "Error: unauthorized");
         }
         dao.deleteAuth(authToken);
     }
