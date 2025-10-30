@@ -1,12 +1,12 @@
 package dataaccess;
 
+import com.google.gson.Gson;
 import exception.ResponseException;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
 
-import java.sql.Connection;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class MySqlDataAccess implements DataAccess{
 
@@ -16,12 +16,27 @@ public class MySqlDataAccess implements DataAccess{
 
     private final String[] createStatements = {
             """
+            CREATE TABLE IF NOT EXISTS user(
+            `username` varchar(256) NOT NULL,
+            `password` varchar(256) NOT NULL,
+            `email` varchar(256) NOT NULL,
+            PRIMARY KEY (`username`)
+            )
+""",
+            """
+            CREATE TABLE IF NOT EXISTS auth(
+            `authToken` varchar(256),
+            `username` varchar(256),
+            FOREIGN KEY (`username`) REFERENCES user (`username`)
+            )
+""",
+            """
             CREATE TABLE IF NOT EXISTS game(
-            `id` int NOT NULL AUTO_INCREMENT,
+            `gameID` int NOT NULL AUTO_INCREMENT,
             `name` varchar(256) NOT NULL,
             `playerColor` ENUM('WHITE', 'BLACK') DEFAULT 'WHITE',
             `json` JSON DEFAULT NULL,
-            PRIMARY KEY (`id`),
+            PRIMARY KEY (`gameID`),
             INDEX(`name`)
             )
 """
@@ -44,18 +59,56 @@ public class MySqlDataAccess implements DataAccess{
     }
 
     @Override
-    public void clear() {
+    public void clear() throws ResponseException, DataAccessException {
+            Connection connection = DatabaseManager.getConnection();
+            try (var statement = connection.createStatement()) {
+
+                statement.executeUpdate("SET FOREIGN_KEY_CHECKS = 0");
+                statement.executeUpdate("TRUNCATE TABLE user");
+                statement.executeUpdate("TRUNCATE TABLE auth");
+                statement.executeUpdate("TRUNCATE TABLE game");
+                statement.executeUpdate("SET FOREIGN_KEY_CHECKS = 1");
+
+            } catch (SQLException ex) {
+                throw new DataAccessException("Error clearing tables: " + ex.getMessage());
+            }
 
     }
 
     @Override
-    public void createUser(UserData user) {
+    public void createUser(UserData user) throws DataAccessException {
+        var statement = "INSERT INTO user (username,password,email) VALUES (?,?,?)";
 
+        try (Connection connection = DatabaseManager.getConnection();
+             PreparedStatement ps = connection.prepareStatement(statement)) {
+            ps.setString(1, user.username());
+            ps.setString(2, user.password());
+            ps.setString(3, user.email());
+
+            ps.executeUpdate();
+
+        } catch (SQLException ex){
+            throw new DataAccessException("Error creating user " + ex.getMessage());
+        }
     }
 
     @Override
-    public UserData getUser(String username) {
-        return null;
+    public UserData getUser(String username) throws DataAccessException {
+        var statement = "SELECT username, password, email FROM user WHERE username = ?";
+        try (Connection connection = DatabaseManager.getConnection()) {
+            var ps = connection.prepareStatement(statement);
+            ps.setString(1,username);
+            try (var rs = ps.executeQuery()){
+                if (rs.next()) {
+                    return new UserData(rs.getString("username"),
+                            rs.getString("password"),
+                            rs.getString("email"));
+                }
+                return null;
+            }
+        } catch (SQLException ex){
+            throw new DataAccessException("Error getting user " + ex.getMessage());
+        }
     }
 
     @Override

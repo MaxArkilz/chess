@@ -1,5 +1,6 @@
 package service;
 
+import dataaccess.DataAccessException;
 import dataaccess.DataAccessMemory;
 import exception.ResponseException;
 import model.AuthData;
@@ -26,7 +27,7 @@ public class UserServiceTests {
 
     // Successful registration
     @Test
-    public void registerSuccess() throws ResponseException {
+    public void registerSuccess() throws ResponseException, DataAccessException {
         var request = UserData.register("ajb263", "P@$$worD1","ajb263@byu.edu");
         var result = userService.register(request);
         Assertions.assertNotNull(result);
@@ -50,7 +51,7 @@ public class UserServiceTests {
 
     // successful login
     @Test
-    public void loginSuccess() throws ResponseException {
+    public void loginSuccess() throws ResponseException, DataAccessException {
         var request = UserData.login("theFirstUser", "weakPassword1");
         var result = userService.login(request);
         Assertions.assertNotNull(result);

@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.DataAccess;
+import dataaccess.DataAccessException;
 import model.AuthData;
 import model.UserData;
 import exception.ResponseException;
@@ -16,7 +17,7 @@ public class UserService {
         this.dao = dao;
     }
 
-    public UserData.LoginResult register(@NotNull UserData.RegisterRequest regRequest) throws ResponseException{
+    public UserData.LoginResult register(@NotNull UserData.RegisterRequest regRequest) throws ResponseException, DataAccessException {
 
         if (regRequest.username() == null || regRequest.password() == null || regRequest.email() == null) {
             throw new ResponseException(ResponseException.Code.ClientError, "Missing one field");
@@ -36,7 +37,7 @@ public class UserService {
         return new UserData.LoginResult(newUser.username(), token);
     }
 
-    public UserData.LoginResult login(@NotNull UserData.LoginRequest loginRequest){
+    public UserData.LoginResult login(@NotNull UserData.LoginRequest loginRequest) throws DataAccessException {
         var user = dao.getUser(loginRequest.username());
 
         if (loginRequest.username() == null || loginRequest.password() == null){

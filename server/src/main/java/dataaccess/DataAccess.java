@@ -1,13 +1,16 @@
 package dataaccess;
 
+import exception.ResponseException;
 import model.*;
+
+import java.sql.SQLException;
 
 public interface DataAccess {
 
-    void clear();
+    void clear() throws ResponseException, DataAccessException, SQLException;
 
-    void createUser(UserData user);
-    UserData getUser(String username);
+    void createUser(UserData user) throws DataAccessException;
+    UserData getUser(String username) throws DataAccessException;
 //
     void createGame(GameData game);
     GameData getGame(int gameID);

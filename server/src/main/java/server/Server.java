@@ -15,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import service.GameService;
 import service.UserService;
 
+import java.sql.SQLException;
 import java.util.Map;
 
 public class Server {
@@ -68,18 +69,18 @@ public class Server {
         javalin.stop();
     }
 
-    private void register(@NotNull Context ctx) throws ResponseException {
+    private void register(@NotNull Context ctx) throws ResponseException, DataAccessException {
         UserData.RegisterRequest request = ctx.bodyAsClass(UserData.RegisterRequest.class);
         var result = userService.register(request);
         ctx.status(200).json(result);
     }
 
-    private void clear(Context ctx) throws ResponseException {
+    private void clear(Context ctx) throws ResponseException, SQLException, DataAccessException {
         dao.clear();
         ctx.status(200).json("{}");
     }
 
-    private void login(Context ctx) throws  ResponseException{
+    private void login(Context ctx) throws ResponseException, DataAccessException {
         UserData.LoginRequest request = ctx.bodyAsClass(UserData.LoginRequest.class);
         var result = userService.login(request);
         ctx.status(200).json(result);
