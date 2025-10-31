@@ -131,11 +131,30 @@ public class MySqlDataAccess implements DataAccess{
     }
 
     @Override
-    public Iterable<GameData> listGames() {
-        var games = new ArrayList<ChessGame>();
-        var statement = "SELECT ";
-        return null;
+    public Iterable<GameData> listGames() throws DataAccessException {
+        var games = new ArrayList<GameData>();
+        try (Connection connection = DatabaseManager.getConnection()){
+            var statement = "SELECT gameID, name, whiteUsername, blackUsername, chessGame FROM game";
+            try (PreparedStatement ps = connection.prepareStatement(statement)){
+                try (ResultSet rs = ps.executeQuery()){
+                    while (rs.next()){
+                        var id = rs.getInt("gameID");
+                        var name = rs.getString("name");
+                        var whiteUsername = rs.getString("whiteUsername");
+                        var blackUsername = rs.getString("blackUsername");
+                        var json = rs.getString("chessGame");
+                        ChessGame game = new Gson().fromJson(json, ChessGame.class);
+
+                        games.add(new GameData(id, whiteUsername, blackUsername, name, game));
+                    }
+                }
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException("Error listing games: " + ex.getMessage());
+        }
+        return games;
     }
+
 
     @Override
     public int getGameID() {

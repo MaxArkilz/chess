@@ -20,7 +20,7 @@ public class GameService {
         this.dao = dao;
     }
 
-    public List<GameData> listGames(String authToken) {
+    public List<GameData> listGames(String authToken) throws DataAccessException {
         var auth = dao.getAuth(authToken);
         if (auth == null) {
             throw new ResponseException(ResponseException.Code.Unauthorized, "Error: unauthorized");
