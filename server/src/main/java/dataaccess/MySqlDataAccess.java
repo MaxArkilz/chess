@@ -15,51 +15,7 @@ public class MySqlDataAccess implements DataAccess{
         configureDatabase();
     }
 
-    private final String[] createStatements = {
-            """
-            CREATE TABLE IF NOT EXISTS user(
-            `username` varchar(256) NOT NULL,
-            `password` varchar(256) NOT NULL,
-            `email` varchar(256) NOT NULL,
-            PRIMARY KEY (`username`)
-            )
-""",
-            """
-            CREATE TABLE IF NOT EXISTS auth(
-            `authToken` varchar(256),
-            `username` varchar(256),
-            FOREIGN KEY (`username`) REFERENCES user (`username`)
-            )
-""",
-            """
-            CREATE TABLE IF NOT EXISTS game(
-            `gameID` int NOT NULL AUTO_INCREMENT,
-            `name` varchar(256) NOT NULL,
-            `whiteUsername` varchar(256) DEFAULT NULL,
-            `blackUsername` varchar(256) DEFAULT NULL,
-            `playerColor` ENUM('WHITE', 'BLACK') DEFAULT 'WHITE',
-            `json` JSON DEFAULT NULL,
-            PRIMARY KEY (`gameID`),
-            INDEX(`name`)
-            )
-"""
-    };
-    
-    private void configureDatabase() throws DataAccessException{
-        DatabaseManager.createDatabase();
-        try (Connection conn = DatabaseManager.getConnection()) {
-            for (String statement : createStatements) {
-                try (var preparedStatement = conn.prepareStatement(statement)){
-                    preparedStatement.executeUpdate();
-                }
-            }
-        } catch (SQLException ex) {
-            throw new ResponseException(
-                    ResponseException.Code.ServerError,
-                    String.format("Unable to configure database: %s", ex.getMessage()));
-        }
 
-    }
 
     @Override
     public void clear() throws ResponseException, DataAccessException {
@@ -115,25 +71,52 @@ public class MySqlDataAccess implements DataAccess{
     }
 
     @Override
-    public void createGame(GameData game) {
+    public void createGame(GameData game) throws DataAccessException {
+        var statement =
+                "INSERT INTO game (name,chessGame) VALUES (?,?)";
 
+        try (Connection connection = DatabaseManager.getConnection();
+
+             PreparedStatement ps = connection.prepareStatement(statement)) {
+
+            Statement stmt = connection.createStatement();
+            ResultSet resultSet = stmt.executeQuery("SHOW DATABASES");
+            while (resultSet.next()) {
+                String dbName = resultSet.getString(1);
+                System.out.println("Database: " + dbName);  // or collect/assert values
+            }
+
+            ps.setString(1, game.gameName());
+            var json = new Gson().toJson(game.game());
+            ps.setString(2, json);
+
+            ps.executeUpdate();
+
+        } catch (SQLException | DataAccessException ex){
+            throw new DataAccessException("Error creating user: " + ex.getMessage());
+        }
     }
 
     @Override
     public GameData getGame(int gameID) throws DataAccessException {
         var statement =
-                "SELECT gameID, name, whiteUsername, blackUsername, playerColor, json FROM game WHERE gameID = ?";
+                "SELECT gameID, whiteUsername, blackUsername, playerColor,name, chessGame FROM game WHERE gameID = ?";
         try (Connection connection = DatabaseManager.getConnection()) {
             var ps = connection.prepareStatement(statement);
             ps.setInt(1,gameID);
+
+
             try (var rs = ps.executeQuery()){
                 if (rs.next()) {
+                    var json = rs.getString("chessGame");
+                    var game = new Gson().fromJson(json, ChessGame.class);
+
                     return new GameData(
                             rs.getInt("gameID"),
                             rs.getString("whiteUsername"),
                             rs.getString("blackUsername"),
                             rs.getString("name"),
-                            rs.getObject("json", ChessGame.class)
+                            game
                     );
                 }
                 return null;
@@ -165,6 +148,52 @@ public class MySqlDataAccess implements DataAccess{
 
     @Override
     public void deleteAuth(String token) {
+
+    }
+
+    private final String[] createStatements = {
+            """
+            CREATE TABLE IF NOT EXISTS user(
+            `username` varchar(256) NOT NULL,
+            `password` varchar(256) NOT NULL,
+            `email` varchar(256) NOT NULL,
+            PRIMARY KEY (`username`)
+            )
+""",
+            """
+            CREATE TABLE IF NOT EXISTS auth(
+            `authToken` varchar(256),
+            `username` varchar(256),
+            FOREIGN KEY (`username`) REFERENCES user (`username`)
+            )
+""",
+            """
+            CREATE TABLE IF NOT EXISTS game(
+            `gameID` int NOT NULL AUTO_INCREMENT,
+            `whiteUsername` varchar(256) DEFAULT NULL,
+            `blackUsername` varchar(256) DEFAULT NULL,
+            `playerColor` ENUM('WHITE', 'BLACK') DEFAULT 'WHITE',
+            `name` varchar(256) NOT NULL,
+            `chessGame` JSON DEFAULT NULL,
+            PRIMARY KEY (`gameID`),
+            INDEX(`name`)
+            )
+"""
+    };
+
+    private void configureDatabase() throws DataAccessException{
+        DatabaseManager.createDatabase();
+        try (Connection conn = DatabaseManager.getConnection()) {
+            for (String statement : createStatements) {
+                try (var preparedStatement = conn.prepareStatement(statement)){
+                    preparedStatement.executeUpdate();
+                }
+            }
+        } catch (SQLException ex) {
+            throw new ResponseException(
+                    ResponseException.Code.ServerError,
+                    String.format("Unable to configure database: %s", ex.getMessage()));
+        }
 
     }
 }

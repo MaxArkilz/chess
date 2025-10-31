@@ -34,7 +34,7 @@ public class GameService {
         return gameList;
     }
 
-    public GameData.CreateGameResponse createGame(String authToken, GameData.CreateGameRequest request) {
+    public GameData.CreateGameResponse createGame(String authToken, GameData.CreateGameRequest request) throws DataAccessException {
         var auth = dao.getAuth(authToken);
         if (auth == null) {
             throw new ResponseException(ResponseException.Code.Unauthorized, "Error: unauthorized");

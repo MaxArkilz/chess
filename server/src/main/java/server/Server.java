@@ -98,7 +98,7 @@ public class Server {
         ctx.status(200).json(Map.of("games", result));
     }
 
-    private void createGame(Context ctx) throws ResponseException{
+    private void createGame(Context ctx) throws ResponseException, DataAccessException {
         String authToken = ctx.header("authorization");
         GameData.CreateGameRequest request = ctx.bodyAsClass(GameData.CreateGameRequest.class);
         var result = gameService.createGame(authToken, request);
@@ -106,7 +106,7 @@ public class Server {
 
     }
 
-    private void joinGame(Context ctx) throws ResponseException{
+    private void joinGame(Context ctx) throws ResponseException, DataAccessException {
         String authToken = ctx.header("authorization");
         var serializer = new Gson();
         GameData.JoinGameRequest request = serializer.fromJson(ctx.body(), GameData.JoinGameRequest.class);

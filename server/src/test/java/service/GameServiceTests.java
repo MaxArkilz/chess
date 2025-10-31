@@ -1,5 +1,6 @@
 package service;
 
+import dataaccess.DataAccessException;
 import dataaccess.DataAccessMemory;
 import exception.ResponseException;
 import model.AuthData;
@@ -55,7 +56,7 @@ public class GameServiceTests {
 
     // create game success
     @Test
-    public void successfulGameCreation() throws ResponseException {
+    public void successfulGameCreation() throws ResponseException, DataAccessException {
         var request = new GameData.CreateGameRequest("Good luck, have fun");
         var result = gameService.createGame(momToken, request);
 
@@ -84,7 +85,7 @@ public class GameServiceTests {
     }
     // join game success
     @Test
-    public void joinGameSuccess() throws ResponseException {
+    public void joinGameSuccess() throws ResponseException, DataAccessException {
         GameData game = new GameData(1002,"yourMother", null, "TheFaceOff", null);
         dao.createGame(game);
 
