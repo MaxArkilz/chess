@@ -1,7 +1,9 @@
 package DataAccessTests;
 
+import chess.ChessGame;
 import dataaccess.DataAccessException;
 import dataaccess.MySqlDataAccess;
+import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,11 +17,12 @@ public class MySqlDataAccessTests {
     public void setup() throws DataAccessException {
         dao = new MySqlDataAccess();
         dao.clear();
-        dao.createUser(new UserData("HereToStay","1234","test@mail.com"));
+
     }
 
     @Test
-    public void clearSuccess() throws Exception {
+    public void clearSuccessTest() throws DataAccessException {
+        dao.createUser(new UserData("HereToStay","1234","test@mail.com"));
         UserData user = dao.getUser("HereToStay");
         Assertions.assertNotNull(user);
 
@@ -27,5 +30,24 @@ public class MySqlDataAccessTests {
 
         user = dao.getUser("HereToStay");
         Assertions.assertNull(user);
+    }
+
+    @Test
+    public void registerUserTestSuccess() throws DataAccessException {
+        dao.createUser(new UserData("Test1", "weak","hi@mail.com"));
+        UserData user = dao.getUser("Test1");
+        String expected = "Test1";
+
+        Assertions.assertEquals(expected, user.username());
+    }
+
+    @Test
+    public void createGameTestSuccess() throws DataAccessException {
+
+        dao.createGame(new GameData(1,null,null,"testGame",new ChessGame()));
+        GameData game = dao.getGame(1);
+        String expected = "testGame";
+
+        Assertions.assertEquals(expected,game.gameName());
     }
 }
