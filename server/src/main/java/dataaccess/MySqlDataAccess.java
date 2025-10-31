@@ -6,8 +6,10 @@ import exception.ResponseException;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.*;
+import java.util.ArrayList;
 
 public class MySqlDataAccess implements DataAccess{
 
@@ -40,6 +42,7 @@ public class MySqlDataAccess implements DataAccess{
 
         try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement ps = connection.prepareStatement(statement)) {
+
             ps.setString(1, user.username());
             ps.setString(2, user.password());
             ps.setString(3, user.email());
@@ -59,6 +62,7 @@ public class MySqlDataAccess implements DataAccess{
             ps.setString(1,username);
             try (var rs = ps.executeQuery()){
                 if (rs.next()) {
+
                     return new UserData(rs.getString("username"),
                             rs.getString("password"),
                             rs.getString("email"));
@@ -128,6 +132,8 @@ public class MySqlDataAccess implements DataAccess{
 
     @Override
     public Iterable<GameData> listGames() {
+        var games = new ArrayList<ChessGame>();
+        var statement = "SELECT ";
         return null;
     }
 

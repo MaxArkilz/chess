@@ -6,6 +6,7 @@ import model.AuthData;
 import model.UserData;
 import exception.ResponseException;
 import org.jetbrains.annotations.NotNull;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.UUID;
 
@@ -27,7 +28,11 @@ public class UserService {
             throw new ResponseException(ResponseException.Code.Forbidden, "Username already taken");
         }
 
-        var newUser = new UserData(regRequest.username(), regRequest.password(), regRequest.email());
+
+
+        String hashedPassword = BCrypt.hashpw(regRequest.password(), BCrypt.gensalt());
+
+        var newUser = new UserData(regRequest.username(), hashedPassword, regRequest.email());
         dao.createUser(newUser);
 
         var token = UUID.randomUUID().toString();
@@ -43,7 +48,11 @@ public class UserService {
         if (loginRequest.username() == null || loginRequest.password() == null){
             throw new ResponseException(ResponseException.Code.ClientError, "Error: bad request");
         }
-        if (user == null || !user.password().equals(loginRequest.password())){
+
+        var hashedPassword = user.password();
+
+
+        if (user == null || BCrypt.checkpw(loginRequest.password(), hashedPassword)){
             throw new ResponseException(ResponseException.Code.Unauthorized,"Error: unauthorized");
         }
 
