@@ -2,6 +2,7 @@ package service;
 
 import chess.ChessGame;
 import dataaccess.DataAccess;
+import dataaccess.DataAccessException;
 import dataaccess.DataAccessMemory;
 import exception.ResponseException;
 import model.AuthData;
@@ -50,7 +51,7 @@ public class GameService {
         return new GameData.CreateGameResponse(newGameID);
     }
 
-    public void joinGame(String authToken, GameData.JoinGameRequest request) {
+    public void joinGame(String authToken, GameData.JoinGameRequest request) throws DataAccessException {
         var auth = dao.getAuth(authToken);
         if (auth == null) {
             throw new ResponseException(ResponseException.Code.Unauthorized, "Error: unauthorized");}

@@ -1,5 +1,6 @@
 package dataaccess;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import exception.ResponseException;
 import model.AuthData;
@@ -34,6 +35,8 @@ public class MySqlDataAccess implements DataAccess{
             CREATE TABLE IF NOT EXISTS game(
             `gameID` int NOT NULL AUTO_INCREMENT,
             `name` varchar(256) NOT NULL,
+            `whiteUsername` varchar(256) DEFAULT NULL,
+            `blackUsername` varchar(256) DEFAULT NULL,
             `playerColor` ENUM('WHITE', 'BLACK') DEFAULT 'WHITE',
             `json` JSON DEFAULT NULL,
             PRIMARY KEY (`gameID`),
@@ -117,8 +120,27 @@ public class MySqlDataAccess implements DataAccess{
     }
 
     @Override
-    public GameData getGame(int gameID) {
-        return null;
+    public GameData getGame(int gameID) throws DataAccessException {
+        var statement =
+                "SELECT gameID, name, whiteUsername, blackUsername, playerColor, json FROM game WHERE gameID = ?";
+        try (Connection connection = DatabaseManager.getConnection()) {
+            var ps = connection.prepareStatement(statement);
+            ps.setInt(1,gameID);
+            try (var rs = ps.executeQuery()){
+                if (rs.next()) {
+                    return new GameData(
+                            rs.getInt("gameID"),
+                            rs.getString("whiteUsername"),
+                            rs.getString("blackUsername"),
+                            rs.getString("name"),
+                            rs.getObject("json", ChessGame.class)
+                    );
+                }
+                return null;
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException("Error getting game" + ex.getMessage());
+        }
     }
 
     @Override
