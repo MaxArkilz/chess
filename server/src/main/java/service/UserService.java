@@ -63,7 +63,7 @@ public class UserService {
         return new UserData.LoginResult(loginRequest.username(), token);
     }
 
-    public void logout(String authToken) {
+    public void logout(String authToken) throws DataAccessException {
         var auth = dao.getAuth(authToken);
         if (auth == null) {
             throw new ResponseException(ResponseException.Code.Unauthorized, "Error: unauthorized");

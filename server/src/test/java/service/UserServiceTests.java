@@ -74,7 +74,7 @@ public class UserServiceTests {
 
     // logout success
     @Test
-    public void logoutSuccess() throws ResponseException {
+    public void logoutSuccess() throws ResponseException, DataAccessException {
 
         String validToken = "123-456-789";
         userService.logout(validToken);

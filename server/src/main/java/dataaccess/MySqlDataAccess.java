@@ -6,7 +6,6 @@ import exception.ResponseException;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
-import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -83,13 +82,6 @@ public class MySqlDataAccess implements DataAccess{
 
              PreparedStatement ps = connection.prepareStatement(statement)) {
 
-            Statement stmt = connection.createStatement();
-            ResultSet resultSet = stmt.executeQuery("SHOW DATABASES");
-            while (resultSet.next()) {
-                String dbName = resultSet.getString(1);
-                System.out.println("Database: " + dbName);  // or collect/assert values
-            }
-
             ps.setString(1, game.gameName());
             var json = new Gson().toJson(game.game());
             ps.setString(2, json);
@@ -162,19 +154,53 @@ public class MySqlDataAccess implements DataAccess{
     }
 
     @Override
-    public void createAuth(AuthData auth) {
+    public void createAuth(AuthData auth) throws DataAccessException {
+        var statement = "INSERT INTO auth (authToken, username) VALUES (?, ?)";
+        try (Connection connection = DatabaseManager.getConnection();
+             PreparedStatement ps = connection.prepareStatement(statement)) {
 
+            ps.setString(1, auth.authToken());
+            ps.setString(2, auth.username());
+            ps.executeUpdate();
+
+        } catch (SQLException | DataAccessException ex) {
+            throw new DataAccessException("Error creating auth: " + ex.getMessage());
+        }
     }
+
 
     @Override
-    public AuthData getAuth(String token) {
-        return null;
+    public AuthData getAuth(String token) throws DataAccessException {
+        var statement = "SELECT authToken, username FROM auth WHERE authToken = ?";
+        try (Connection connection = DatabaseManager.getConnection();
+             PreparedStatement ps = connection.prepareStatement(statement)) {
+
+            ps.setString(1, token);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new AuthData(rs.getString("authToken"), rs.getString("username"));
+                }
+                return null;
+            }
+        } catch (SQLException | DataAccessException ex) {
+            throw new DataAccessException("Error retrieving auth: " + ex.getMessage());
+        }
     }
+
 
     @Override
-    public void deleteAuth(String token) {
+    public void deleteAuth(String token) throws DataAccessException {
+        var statement = "DELETE FROM auth WHERE authToken = ?";
+        try (Connection connection = DatabaseManager.getConnection();
+             PreparedStatement ps = connection.prepareStatement(statement)) {
 
+            ps.setString(1, token);
+            ps.executeUpdate();
+        } catch (SQLException | DataAccessException ex) {
+            throw new DataAccessException("Error deleting auth: " + ex.getMessage());
+        }
     }
+
 
     private final String[] createStatements = {
             """

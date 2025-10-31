@@ -34,7 +34,7 @@ public class GameServiceTests {
 
     // list game success
     @Test
-    public void listGameSuccess() throws ResponseException {
+    public void listGameSuccess() throws ResponseException, DataAccessException {
         dao.createGame(new GameData(1000, "yourMother", "", "Active Game", null));
         dao.createGame(new GameData(1001, null, null, "Empty Game", null));
 

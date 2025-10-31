@@ -86,13 +86,13 @@ public class Server {
         ctx.status(200).json(result);
     }
 
-    private void logout(Context ctx) throws ResponseException {
+    private void logout(Context ctx) throws ResponseException, DataAccessException {
         String authToken = ctx.header("authorization");
         userService.logout(authToken);
         ctx.status(200).json("{}");
     }
 
-    private void listGames(Context ctx) throws ResponseException{
+    private void listGames(Context ctx) throws ResponseException, DataAccessException {
         String authToken = ctx.header("authorization");
         var result = gameService.listGames(authToken);
         ctx.status(200).json(Map.of("games", result));
