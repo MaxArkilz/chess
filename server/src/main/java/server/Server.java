@@ -58,7 +58,7 @@ public class Server {
     private void registerEndpoints() {
         // Same registration as before
         javalin.exception(ResponseException.class, ((e, context) -> {
-            context.status(500);
+            context.status(e.getStatusCode()); // Use the correct status code!
             context.json(Map.of("message", "Error: " + e.getMessage()));
         }));
         javalin.exception(DataAccessException.class, (e, ctx) -> {
