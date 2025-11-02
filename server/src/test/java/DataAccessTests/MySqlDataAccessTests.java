@@ -85,11 +85,12 @@ public class MySqlDataAccessTests {
         Assertions.assertEquals(expected,game.gameName());
     }
 
-    public void getGameTestSuccess() throws DataAccessException {
-
-
-
-
+    @Test
+    public void createGameMissingNameTestFail() throws DataAccessException {
+        GameData game = new GameData(0, null, null, null, new ChessGame());
+        Assertions.assertThrows(DataAccessException.class, ()-> dao.createGame(game));
     }
+
+
 
 }
