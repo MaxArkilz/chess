@@ -46,7 +46,7 @@ public class MySqlDataAccessTests {
     }
 
     @Test
-    public void createUserDuplicateUserFail() throws DataAccessException {
+    public void createUserDuplicateUserFail() {
         UserData repeatUser =
                 new UserData("MyBeloved", "$tr0ngP@sSworD94", "realMail@mail.com");
         Assertions.assertThrows(DataAccessException.class, () ->
@@ -54,11 +54,24 @@ public class MySqlDataAccessTests {
     }
 
     @Test
-    public void createUserMissingUsernameFail() throws DataAccessException {
+    public void createUserMissingUsernameFail() {
         UserData sloppyJoe =
                 new UserData(null, "2000", "idk@mail.com");
         Assertions.assertThrows(DataAccessException.class, () ->
                 dao.createUser(sloppyJoe));
+    }
+
+    @Test
+    public void getUserSuccessTest() throws DataAccessException {
+        UserData user = dao.getUser("MyBeloved");
+        Assertions.assertNotNull(user);
+        Assertions.assertEquals("MyBeloved", user.username());
+    }
+
+    @Test
+    public void getUserNotFoundTestFail() throws DataAccessException {
+        UserData user = dao.getUser("Jonny Sims");
+        Assertions.assertNull(user);
     }
 
     @Test
