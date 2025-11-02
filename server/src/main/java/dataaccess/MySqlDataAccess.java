@@ -144,7 +144,10 @@ public class MySqlDataAccess implements DataAccess{
             ps.setString(2, game.blackUsername());
             ps.setInt(3, game.gameID());
 
-            ps.executeUpdate();
+            int successFlag = ps.executeUpdate();
+            if (successFlag == 0) {
+                throw new DataAccessException("Game not found: " + game.gameID());
+            }
 
         } catch (SQLException ex) {
             throw new RuntimeException("Error updating game" + ex.getMessage());
