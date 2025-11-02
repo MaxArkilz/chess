@@ -18,7 +18,8 @@ public class MySqlDataAccessTests {
         dao = new MySqlDataAccess();
         dao.clear();
         dao.createGame(new GameData(
-                0, null,null,"theOG",new ChessGame()));
+                1, null,null,"theOG",new ChessGame()));
+        dao.createUser(new UserData("MyBeloved", "$tr0ngP@sSworD94", "realMail@mail.com"));
 
 
     }
@@ -36,7 +37,7 @@ public class MySqlDataAccessTests {
     }
 
     @Test
-    public void registerUserTestSuccess() throws DataAccessException {
+    public void createUserTestSuccess() throws DataAccessException {
         dao.createUser(new UserData("Test1", "weak","hi@mail.com"));
         UserData user = dao.getUser("Test1");
         String expected = "Test1";
@@ -45,11 +46,27 @@ public class MySqlDataAccessTests {
     }
 
     @Test
+    public void createUserDuplicateUserFail() throws DataAccessException {
+        UserData repeatUser =
+                new UserData("MyBeloved", "$tr0ngP@sSworD94", "realMail@mail.com");
+        Assertions.assertThrows(DataAccessException.class, () ->
+            dao.createUser(repeatUser));
+    }
+
+    @Test
+    public void createUserMissingUsernameFail() throws DataAccessException {
+        UserData sloppyJoe =
+                new UserData(null, "2000", "idk@mail.com");
+        Assertions.assertThrows(DataAccessException.class, () ->
+                dao.createUser(sloppyJoe));
+    }
+
+    @Test
     public void createGameTestSuccess() throws DataAccessException {
 
-        dao.createGame(new GameData(
+        int gameID = dao.createGame(new GameData(
                 0,null,null,"testGame",new ChessGame()));
-        GameData game = dao.getGame(1);
+        GameData game = dao.getGame(gameID);
         String expected = "testGame";
 
         Assertions.assertEquals(expected,game.gameName());
