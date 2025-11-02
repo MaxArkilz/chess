@@ -58,9 +58,21 @@ public class Server {
     private void registerEndpoints() {
         // Same registration as before
         javalin.exception(ResponseException.class, ((e, context) -> {
-            context.status(e.getStatusCode());
+            context.status(500);
             context.json(Map.of("message", "Error: " + e.getMessage()));
         }));
+        javalin.exception(DataAccessException.class, (e, ctx) -> {
+            ctx.status(500);
+            ctx.json(Map.of("message", "Error: " + e.getMessage()));
+        });
+        javalin.exception(SQLException.class, (e, ctx) -> {
+            ctx.status(500);
+            ctx.json(Map.of("message", "Error: " + e.getMessage()));
+        });
+        javalin.exception(Exception.class, (e, ctx) -> {
+            ctx.status(500);
+            ctx.json(Map.of("message", "Error: " + e.getMessage()));
+        });
         javalin.post("/user", this::register);
         javalin.delete("/db", this::clear);
         javalin.post("/session", this::login);
