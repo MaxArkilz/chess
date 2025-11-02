@@ -147,6 +147,15 @@ public class MySqlDataAccessTests {
     }
 
     @Test
+    void listGamesFailTest() throws DataAccessException {
+        dao.clear();
+
+        Iterable<GameData> games = dao.listGames();
+
+        Assertions.assertFalse(games.iterator().hasNext());
+    }
+
+    @Test
     void createAuthSuccessTest() throws DataAccessException {
         AuthData auth = new AuthData("123456789", "baberham");
         dao.createUser(new UserData("baberham", "typicalpassword", "abe@email.com"));
@@ -180,6 +189,11 @@ public class MySqlDataAccessTests {
 
         dao.deleteAuth("a-a-142j12-sajawryuig");
         Assertions.assertNull(dao.getAuth("a-a-142j12-sajawryuig"));
+    }
+
+    @Test
+    void deleteAuthFailTest() {
+        Assertions.assertThrows(DataAccessException.class, ()-> dao.deleteAuth("totallyreal"));
     }
 
 

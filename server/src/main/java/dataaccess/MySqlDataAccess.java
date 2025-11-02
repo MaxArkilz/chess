@@ -221,7 +221,11 @@ public class MySqlDataAccess implements DataAccess{
              PreparedStatement ps = connection.prepareStatement(statement)) {
 
             ps.setString(1, token);
-            ps.executeUpdate();
+
+            int successFlag = ps.executeUpdate();
+            if (successFlag == 0) {
+                throw new DataAccessException("Token not found: " + token);
+            }
         } catch (SQLException | DataAccessException ex) {
             throw new DataAccessException("Error deleting auth: " + ex.getMessage());
         }
