@@ -18,14 +18,15 @@ public class UserService {
         this.dao = dao;
     }
 
-    public UserData.LoginResult register(@NotNull UserData.RegisterRequest regRequest) throws ResponseException, DataAccessException {
+    public UserData.LoginResult register(@NotNull UserData.RegisterRequest regRequest)
+            throws ResponseException, DataAccessException {
 
         if (regRequest.username() == null || regRequest.password() == null || regRequest.email() == null) {
-            throw new ResponseException(ResponseException.Code.ClientError, "Missing one field");
+            throw new ResponseException(400, "Missing one field");
         }
         var existing = dao.getUser(regRequest.username());
         if (existing != null) {
-            throw new ResponseException(ResponseException.Code.Forbidden, "Username already taken");
+            throw new ResponseException(403, "Username already taken");
         }
 
 
@@ -46,14 +47,18 @@ public class UserService {
         var user = dao.getUser(loginRequest.username());
 
         if (loginRequest.username() == null || loginRequest.password() == null){
-            throw new ResponseException(ResponseException.Code.ClientError, "Error: bad request");
+            throw new ResponseException(400, "Error: bad request");
+        }
+
+        if (user == null) {
+            throw new ResponseException(401, "Error: unauthorized"); // Or customize this message
         }
 
         var hashedPassword = user.password();
 
 
-        if (BCrypt.checkpw(loginRequest.password(), hashedPassword)){
-            throw new ResponseException(ResponseException.Code.Unauthorized,"Error: unauthorized");
+        if (!BCrypt.checkpw(loginRequest.password(), hashedPassword)){
+            throw new ResponseException(401,"Error: unauthorized");
         }
 
         var token = UUID.randomUUID().toString();
@@ -66,7 +71,7 @@ public class UserService {
     public void logout(String authToken) throws DataAccessException {
         var auth = dao.getAuth(authToken);
         if (auth == null) {
-            throw new ResponseException(ResponseException.Code.Unauthorized, "Error: unauthorized");
+            throw new ResponseException(401, "Error: unauthorized");
         }
         dao.deleteAuth(authToken);
     }

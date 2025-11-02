@@ -12,14 +12,14 @@ import java.util.ArrayList;
 
 public class MySqlDataAccess implements DataAccess{
 
-    public MySqlDataAccess() throws ResponseException, DataAccessException {
+    public MySqlDataAccess() throws DataAccessException {
         configureDatabase();
     }
 
 
 
     @Override
-    public void clear() throws ResponseException, DataAccessException {
+    public void clear() throws DataAccessException{
             Connection connection = DatabaseManager.getConnection();
             try (var statement = connection.createStatement()) {
 
@@ -74,25 +74,31 @@ public class MySqlDataAccess implements DataAccess{
     }
 
     @Override
-    public void createGame(GameData game) throws DataAccessException {
-        String statement = "INSERT INTO game (name, whiteUsername, blackUsername, chessGame) VALUES (?,?,?,?)";
+    public int createGame(GameData game) throws DataAccessException {
+        String statement = "INSERT INTO game (name, chessGame) VALUES (?,?)";
 
 
         try (Connection connection = DatabaseManager.getConnection();
 
-             PreparedStatement ps = connection.prepareStatement(statement)) {
+             PreparedStatement ps = connection.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS)) {
 
 
             var json = new Gson().toJson(game.game());
 
             ps.setString(1, game.gameName());
-            ps.setString(2, game.whiteUsername());
-            ps.setString(3, game.blackUsername());
-            ps.setString(4, json);
+            ps.setString(2, json);
 
             ps.executeUpdate();
 
-        } catch (SQLException | DataAccessException ex){
+            try (ResultSet keys = ps.getGeneratedKeys()) {
+                if (keys.next()) {
+                    return keys.getInt(1);
+                } else {
+                    throw new DataAccessException("No gameID returned from database!");
+                }
+            }
+
+        } catch (SQLException ex){
             throw new DataAccessException("Error creating user: " + ex.getMessage());
         }
     }
@@ -127,6 +133,25 @@ public class MySqlDataAccess implements DataAccess{
     }
 
     @Override
+    public void updateGame (GameData game) throws DataAccessException {
+        String statement =
+                    "UPDATE game SET whiteUsername = ?, blackUsername = ? WHERE gameID = ?";
+
+        try (Connection connection = DatabaseManager.getConnection()){
+            PreparedStatement ps = connection.prepareStatement(statement);
+
+            ps.setString(1, game.whiteUsername());
+            ps.setString(2, game.blackUsername());
+            ps.setInt(3, game.gameID());
+
+            ps.executeUpdate();
+
+        } catch (SQLException ex) {
+            throw new RuntimeException("Error updating game" + ex.getMessage());
+        }
+    }
+
+    @Override
     public Iterable<GameData> listGames() throws DataAccessException {
         var games = new ArrayList<GameData>();
         try (Connection connection = DatabaseManager.getConnection()){
@@ -149,12 +174,6 @@ public class MySqlDataAccess implements DataAccess{
             throw new DataAccessException("Error listing games: " + ex.getMessage());
         }
         return games;
-    }
-
-
-    @Override
-    public int getGameID() {
-        return 0;
     }
 
     @Override
@@ -246,7 +265,7 @@ public class MySqlDataAccess implements DataAccess{
             }
         } catch (SQLException ex) {
             throw new ResponseException(
-                    ResponseException.Code.ServerError,
+                    500,
                     String.format("Unable to configure database: %s", ex.getMessage()));
         }
 

@@ -28,7 +28,8 @@ public class Server {
 
 
     public Server() {
-        this(new DataAccessMemory());
+//        this(new DataAccessMemory());
+        this(createMySqlDA());
     }
 
     public Server(DataAccess dao) {
@@ -37,6 +38,14 @@ public class Server {
         this.gameService = new GameService(dao);
         this.javalin = makeJavalin();
         registerEndpoints();
+    }
+
+    private static DataAccess createMySqlDA() {
+        try {
+            return new MySqlDataAccess();
+        } catch (Exception ex) {
+            throw new RuntimeException(ex.getMessage());
+        }
     }
 
     private Javalin makeJavalin() {
@@ -49,7 +58,7 @@ public class Server {
     private void registerEndpoints() {
         // Same registration as before
         javalin.exception(ResponseException.class, ((e, context) -> {
-            context.status(e.toHttpStatusCode());
+            context.status(e.getStatusCode());
             context.json(Map.of("message", "Error: " + e.getMessage()));
         }));
         javalin.post("/user", this::register);

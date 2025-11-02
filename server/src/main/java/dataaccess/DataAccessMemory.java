@@ -28,15 +28,17 @@ public class DataAccessMemory implements DataAccess{
     }
 
     @Override
-    public void createGame(GameData game) {
-        games.put(game.gameID(), game);
-    }
-
-    public int getGameID(){
-
+    public int createGame(GameData game) {
         int currentGameID = gameID;
+        GameData gameWithID = new GameData(currentGameID, game.whiteUsername(), game.blackUsername(), game.gameName(), game.game());
+        games.put(currentGameID, gameWithID);
         gameID += 1;
         return currentGameID;
+    }
+
+    @Override
+    public void updateGame(GameData game) {
+        games.put(game.gameID(), game);
     }
 
     @Override

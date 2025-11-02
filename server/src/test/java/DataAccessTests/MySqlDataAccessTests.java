@@ -17,6 +17,9 @@ public class MySqlDataAccessTests {
     public void setup() throws DataAccessException {
         dao = new MySqlDataAccess();
         dao.clear();
+        dao.createGame(new GameData(
+                0, null,null,"theOG",new ChessGame()));
+
 
     }
 
@@ -44,10 +47,19 @@ public class MySqlDataAccessTests {
     @Test
     public void createGameTestSuccess() throws DataAccessException {
 
-        dao.createGame(new GameData(1,null,null,"testGame",new ChessGame()));
+        dao.createGame(new GameData(
+                0,null,null,"testGame",new ChessGame()));
         GameData game = dao.getGame(1);
         String expected = "testGame";
 
         Assertions.assertEquals(expected,game.gameName());
     }
+
+    public void getGameTestSuccess() throws DataAccessException {
+
+
+
+
+    }
+
 }

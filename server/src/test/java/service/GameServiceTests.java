@@ -86,13 +86,11 @@ public class GameServiceTests {
     // join game success
     @Test
     public void joinGameSuccess() throws ResponseException, DataAccessException {
-        GameData game = new GameData(1002,"yourMother", null, "TheFaceOff", null);
-        dao.createGame(game);
-
-        var request = new GameData.JoinGameRequest("BLACK", 1002);
+        int createdGameID = dao.createGame(new GameData(0, "yourMother", null, "TheFaceOff", null));
+        var request = new GameData.JoinGameRequest("BLACK", createdGameID);
         gameService.joinGame(dadToken, request);
 
-        GameData updatedGame = dao.getGame(1002);
+        GameData updatedGame = dao.getGame(createdGameID);
         Assertions.assertEquals("yourFather", updatedGame.blackUsername());
     }
     // join game unauthorized failure
@@ -118,10 +116,11 @@ public class GameServiceTests {
     @Test
     public void joinGameColorTaken() {
         // Set up game where WHITE is taken
-        GameData game = new GameData(1007, "yourMother", null, "YouShallNotPass", null);
-        dao.createGame(game);
+        int createdGameID =
+                dao.createGame(new GameData(
+                        1007, "yourMother", null, "YouShallNotPass", null));
 
-        var request = new GameData.JoinGameRequest("WHITE", 1007);
+        var request = new GameData.JoinGameRequest("WHITE", createdGameID);
 
         ResponseException ex = Assertions.assertThrows(ResponseException.class, () -> gameService.joinGame(dadToken, request));
         Assertions.assertEquals(403, ex.getStatusCode());

@@ -23,7 +23,7 @@ public class GameService {
     public List<GameData> listGames(String authToken) throws DataAccessException {
         var auth = dao.getAuth(authToken);
         if (auth == null) {
-            throw new ResponseException(ResponseException.Code.Unauthorized, "Error: unauthorized");
+            throw new ResponseException(401, "Error: unauthorized");
         }
 
         Iterable<GameData> games = dao.listGames();
@@ -37,16 +37,15 @@ public class GameService {
     public GameData.CreateGameResponse createGame(String authToken, GameData.CreateGameRequest request) throws DataAccessException {
         var auth = dao.getAuth(authToken);
         if (auth == null) {
-            throw new ResponseException(ResponseException.Code.Unauthorized, "Error: unauthorized");
+            throw new ResponseException(401, "Error: unauthorized");
         }
 
         if (request.gameName() == null){
-            throw new ResponseException(ResponseException.Code.ClientError, "Error: bad request");
+            throw new ResponseException(400, "Error: bad request");
         }
 
-        int newGameID = dao.getGameID();
-        var newGame = new GameData(newGameID,null,null,request.gameName(),null);
-        dao.createGame(newGame);
+        var newGame = new GameData(0,null,null,request.gameName(),null);
+        int newGameID = dao.createGame(newGame);
 
         return new GameData.CreateGameResponse(newGameID);
     }
@@ -54,30 +53,30 @@ public class GameService {
     public void joinGame(String authToken, GameData.JoinGameRequest request) throws DataAccessException {
         var auth = dao.getAuth(authToken);
         if (auth == null) {
-            throw new ResponseException(ResponseException.Code.Unauthorized, "Error: unauthorized");}
+            throw new ResponseException(401, "Error: unauthorized");}
         if (request.playerColor() == null){
-            throw new ResponseException(ResponseException.Code.ClientError, "Error: bad request");}
+            throw new ResponseException(400, "Error: bad request");}
 
         var game = dao.getGame(request.gameID());
         String username = auth.username();
 
 
         if (!request.playerColor().equals("WHITE") && !request.playerColor().equals("BLACK")) {
-            throw new ResponseException(ResponseException.Code.ClientError, "Error: bad request");}
+            throw new ResponseException(400, "Error: bad request");}
         if (game == null) {
-            throw new ResponseException(ResponseException.Code.ClientError, "Error: game not found");}
+            throw new ResponseException(400, "Error: game not found");}
 
         if ((request.playerColor().equals("WHITE")
                 && game.whiteUsername() != null)
                 || (request.playerColor().equals("BLACK")
                 && game.blackUsername() != null)){
-            throw new ResponseException(ResponseException.Code.Forbidden, "Error: already taken");}
+            throw new ResponseException(403, "Error: already taken");}
 
         GameData updatedGame;
         if (request.playerColor().equals("WHITE")) {
             updatedGame = new GameData(game.gameID(), username, game.blackUsername(), game.gameName(), game.game());
         } else {
             updatedGame = new GameData(game.gameID(), game.whiteUsername(), username, game.gameName(), game.game());}
-        dao.createGame(updatedGame);
+        dao.updateGame(updatedGame);
     }
 }

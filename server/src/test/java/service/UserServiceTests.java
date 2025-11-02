@@ -15,12 +15,12 @@ public class UserServiceTests {
     private DataAccessMemory dao;
 
     @BeforeEach
-    public void setup(){
+    public void setup() throws DataAccessException {
         dao = new DataAccessMemory();
         dao.clear();
         userService = new UserService(dao);
 
-        dao.createUser(new UserData("theFirstUser", "weakPassword1", "user@email.com"));
+        userService.register(UserData.register("theFirstUser", "weakPassword1", "user@email.com"));
         String token = "123-456-789";
         dao.createAuth(new AuthData(token, "theFirstUser"));
     }
@@ -52,6 +52,7 @@ public class UserServiceTests {
     // successful login
     @Test
     public void loginSuccess() throws ResponseException, DataAccessException {
+
         var request = UserData.login("theFirstUser", "weakPassword1");
         var result = userService.login(request);
         Assertions.assertNotNull(result);
