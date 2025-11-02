@@ -52,7 +52,7 @@ public class UserService {
         var hashedPassword = user.password();
 
 
-        if (user == null || BCrypt.checkpw(loginRequest.password(), hashedPassword)){
+        if (BCrypt.checkpw(loginRequest.password(), hashedPassword)){
             throw new ResponseException(ResponseException.Code.Unauthorized,"Error: unauthorized");
         }
 

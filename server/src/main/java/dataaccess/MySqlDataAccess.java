@@ -75,16 +75,20 @@ public class MySqlDataAccess implements DataAccess{
 
     @Override
     public void createGame(GameData game) throws DataAccessException {
-        var statement =
-                "INSERT INTO game (name,chessGame) VALUES (?,?)";
+        String statement = "INSERT INTO game (name, whiteUsername, blackUsername, chessGame) VALUES (?,?,?,?)";
+
 
         try (Connection connection = DatabaseManager.getConnection();
 
              PreparedStatement ps = connection.prepareStatement(statement)) {
 
-            ps.setString(1, game.gameName());
+
             var json = new Gson().toJson(game.game());
-            ps.setString(2, json);
+
+            ps.setString(1, game.gameName());
+            ps.setString(2, game.whiteUsername());
+            ps.setString(3, game.blackUsername());
+            ps.setString(4, json);
 
             ps.executeUpdate();
 
