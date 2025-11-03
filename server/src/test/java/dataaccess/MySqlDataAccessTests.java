@@ -1,8 +1,6 @@
-package dataaccesstests;
+package dataaccess;
 
 import chess.ChessGame;
-import dataaccess.DataAccessException;
-import dataaccess.MySqlDataAccess;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
