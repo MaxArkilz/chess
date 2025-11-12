@@ -1,3 +1,5 @@
+package clientSide;
+
 import com.google.gson.Gson;
 import exception.ResponseException;
 import model.AuthData;
@@ -15,7 +17,7 @@ public class ServerFacade {
     public ServerFacade(String url) {serverUrl = url;}
 
     public AuthData register(UserData.RegisterRequest req) throws ResponseException{
-        var request = buildRequest("POST", "/login", req);
+        var request = buildRequest("POST", "/user", req);
         var response = sendRequest(request);
         return handleResponse(response, AuthData.class);
     };

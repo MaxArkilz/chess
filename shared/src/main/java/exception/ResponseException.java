@@ -13,9 +13,9 @@ public class ResponseException extends RuntimeException{
 
     public static ResponseException fromJson(String json) {
         var map = new Gson().fromJson(json, HashMap.class);
-        int status = ((Number)map.get("status")).intValue();
-        String message = map.get("message").toString();
-        return new ResponseException(status, message);
+        Object messageObj = map.get("message");
+        String message = (messageObj != null) ? messageObj.toString() : "Unknown error";
+        return new ResponseException(500, message); // Use actual status code if available
     }
 
     public static int fromHttpStatusCode(int status) {
