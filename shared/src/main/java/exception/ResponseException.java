@@ -11,6 +11,17 @@ public class ResponseException extends RuntimeException{
     private final int statusCode;
     private final String message;
 
+    public static ResponseException fromJson(String json) {
+        var map = new Gson().fromJson(json, HashMap.class);
+        int status = ((Number)map.get("status")).intValue();
+        String message = map.get("message").toString();
+        return new ResponseException(status, message);
+    }
+
+    public static int fromHttpStatusCode(int status) {
+        return status;
+    }
+
 
     public enum Code {
         ServerError,
