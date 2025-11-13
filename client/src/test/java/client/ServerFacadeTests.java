@@ -19,6 +19,12 @@ public class ServerFacadeTests {
             "SUDO","merryChristmas!");
     private static GameData.CreateGameRequest testGameReq = new GameData.CreateGameRequest(
             "theMasterGame");
+    private static GameData.CreateGameRequest testGameReq2 = new GameData.CreateGameRequest(
+            "theBachelorGame");
+    private static GameData.CreateGameRequest testGameReq3 = new GameData.CreateGameRequest(
+            "theAssociateGame");
+
+
 
     @BeforeAll
     public static void init() {
@@ -107,6 +113,26 @@ public class ServerFacadeTests {
         var authData = facade.login(testLog);
         facade.createGame(authData.authToken(),testGameReq);
         assertThrows(ResponseException.class, () -> facade.createGame(authData.authToken(),testGameReq));
+    }
+
+    @Test
+    public void listGamesSuccess() throws ResponseException {
+        facade.register(testReg);
+        var authData = facade.login(testLog);
+
+        Iterable<GameData> games = facade.listGames(authData.authToken());
+        assertFalse(games.iterator().hasNext());
+
+        facade.createGame(authData.authToken(),testGameReq);
+        facade.createGame(authData.authToken(),testGameReq2);
+        facade.createGame(authData.authToken(),testGameReq3);
+
+        assertEquals(3, facade.listGames(authData.authToken()).size());
+    }
+
+    @Test
+    public void listGamesFailureNoLogin() throws ResponseException {
+        assertThrows(ResponseException.class, () -> facade.listGames(null));
     }
 
 
