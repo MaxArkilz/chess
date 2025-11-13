@@ -1,6 +1,7 @@
 package client;
 
 import exception.ResponseException;
+import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.*;
 import server.Server;
@@ -12,6 +13,12 @@ public class ServerFacadeTests {
 
     private static Server server;
     private static ServerFacade facade;
+    private static UserData.RegisterRequest testReg = new UserData.RegisterRequest(
+            "SUDO","merryChristmas!","theOne@mail.com");
+    private static UserData.LoginRequest testLog = new UserData.LoginRequest(
+            "SUDO","merryChristmas!");
+    private static GameData.CreateGameRequest testGameReq = new GameData.CreateGameRequest(
+            "theMasterGame");
 
     @BeforeAll
     public static void init() {
@@ -20,6 +27,7 @@ public class ServerFacadeTests {
         System.out.println("Started test HTTP server on " + port);
         facade = new ServerFacade("http://localhost:" + port);
         facade.clearData();
+
 
     }
 
@@ -72,6 +80,21 @@ public class ServerFacadeTests {
         ));
         facade.logout(authData.authToken());
         assertThrows(ResponseException.class, () -> facade.logout(authData.authToken()));
+    }
+
+    @Test
+    public void createGameSuccess() throws ResponseException {
+        facade.register(testReg);
+        var authData = facade.login(testLog);
+
+        Iterable<GameData> games = facade.listGames(authData.authToken());
+        assertFalse(games.iterator().hasNext());
+
+        facade.createGame(authData.authToken(), testGameReq);
+
+        assertNotNull(facade.listGames(authData.authToken()));
+
+
     }
 
 
