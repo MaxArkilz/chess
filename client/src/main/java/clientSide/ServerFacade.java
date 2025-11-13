@@ -60,6 +60,12 @@ public class ServerFacade {
         }
     }
 
+    public void joinGame(String authToken, GameData.JoinGameRequest req) throws ResponseException {
+        var request = buildRequest("PUT", "/game", req,authToken);
+        var response = sendRequest(request);
+        handleResponse(response, null);
+    }
+
 
     //helper functions
     private static class GamesWrapper{
