@@ -44,6 +44,10 @@ public class GameService {
             throw new ResponseException(400, "Error: bad request");
         }
 
+        if (dao.gameName(request.gameName()) != null){
+            throw new ResponseException(400, "Error: game already exists with that name");
+        }
+
         var newGame = new GameData(0,null,null,request.gameName(),null);
         int newGameID = dao.createGame(newGame);
 

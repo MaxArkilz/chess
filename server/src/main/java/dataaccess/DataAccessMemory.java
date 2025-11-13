@@ -47,6 +47,11 @@ public class DataAccessMemory implements DataAccess{
     }
 
     @Override
+    public GameData gameName(String gameName) throws DataAccessException {
+        return games.get(gameName);
+    }
+
+    @Override
     public Iterable<GameData> listGames() {
         return games.values();
     }

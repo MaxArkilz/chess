@@ -83,6 +83,12 @@ public class ServerFacadeTests {
     }
 
     @Test
+    public void logoutFailureWrongAuth() throws ResponseException {
+        var authData = facade.register(testReg);
+        assertThrows(ResponseException.class, () -> facade.logout("totallyCorrectToken"));
+    }
+
+    @Test
     public void createGameSuccess() throws ResponseException {
         facade.register(testReg);
         var authData = facade.login(testLog);
@@ -93,8 +99,14 @@ public class ServerFacadeTests {
         facade.createGame(authData.authToken(), testGameReq);
 
         assertNotNull(facade.listGames(authData.authToken()));
+    }
 
-
+    @Test
+    public void createGameFailureDuplicate() throws ResponseException {
+        facade.register(testReg);
+        var authData = facade.login(testLog);
+        facade.createGame(authData.authToken(),testGameReq);
+        assertThrows(ResponseException.class, () -> facade.createGame(authData.authToken(),testGameReq));
     }
 
 
