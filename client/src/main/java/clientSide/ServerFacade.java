@@ -16,11 +16,36 @@ public class ServerFacade {
 
     public ServerFacade(String url) {serverUrl = url;}
 
+    public void clearData() throws ResponseException {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(serverUrl + "/db"))
+                .DELETE()
+                .build();
+        var result = sendRequest(request);
+        handleResponse(result, null);
+    }
+
     public AuthData register(UserData.RegisterRequest req) throws ResponseException{
         var request = buildRequest("POST", "/user", req);
         var response = sendRequest(request);
         return handleResponse(response, AuthData.class);
-    };
+    }
+
+    public AuthData login(UserData.LoginRequest req) throws ResponseException {
+        var request = buildRequest("POST", "/session", req);
+        var response = sendRequest(request);
+        return handleResponse(response, AuthData.class);
+    }
+
+    public void logout(String authToken) throws ResponseException {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(serverUrl + "/session"))
+                .header("authorization", authToken)
+                .DELETE()
+                .build();
+        var response = sendRequest(request);
+        handleResponse(response, null);
+    }
 
 
     //helper functions

@@ -19,12 +19,17 @@ public class ServerFacadeTests {
         var port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
         facade = new ServerFacade("http://localhost:" + port);
+        facade.clearData();
+
     }
 
     @AfterAll
     static void stopServer() {
+        facade.clearData();
         server.stop();
     }
+
+
 
 
     @Test
@@ -36,9 +41,38 @@ public class ServerFacadeTests {
 
     @Test
     public void registerFailureNoUsername() throws ResponseException {
-        var authData = new UserData.RegisterRequest(
+        var regRequest = new UserData.RegisterRequest(
                 null,"forgotIt","test@mail.com");
-        assertThrows(ResponseException.class, () -> facade.register(authData));
+        assertThrows(ResponseException.class, () -> facade.register(regRequest));
     }
+
+    @Test
+    public void loginSuccess() throws ResponseException {
+        facade.register(new UserData.RegisterRequest(
+                "Light","godOfTheNewWorld","yagami99@hotmail.com"));
+        var loginRequest = new UserData.LoginRequest(
+                "Light","godOfTheNewWorld");
+        var authData = facade.login(loginRequest);
+        assertNotNull(authData.authToken());
+    }
+
+    @Test
+    public void loginFailureIncorrectPassword() throws ResponseException {
+        facade.register(new UserData.RegisterRequest(
+                "L","gonnaGetYa","Lboy@Lsite.com"));
+        var loginRequest = new UserData.LoginRequest(
+                "L","gonnaGetya");
+        assertThrows(ResponseException.class, () -> facade.login(loginRequest));
+    }
+
+    @Test
+    public void logoutSuccess() throws ResponseException {
+        var authData = facade.register(new UserData.RegisterRequest(
+                "1","2","3@4.567"
+        ));
+        facade.logout(authData.authToken());
+        assertThrows(ResponseException.class, () -> facade.logout(authData.authToken()));
+    }
+
 
 }

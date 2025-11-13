@@ -2,5 +2,6 @@ package clientSide;
 
 public enum State {
     SIGNEDOUT,
-    SIGNEDIN
+    SIGNEDIN,
+    GAMEMODE
 }
