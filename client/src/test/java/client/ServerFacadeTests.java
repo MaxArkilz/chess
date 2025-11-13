@@ -135,5 +135,23 @@ public class ServerFacadeTests {
         assertThrows(ResponseException.class, () -> facade.listGames(null));
     }
 
+    @Test
+    public void joinGameSuccess() throws ResponseException {
+        facade.register(testReg);
+        var authData = facade.login(testLog);
+        GameData newGame = facade.createGame(authData.authToken(),testGameReq);
+        GameData.JoinGameRequest joinReq = new GameData.JoinGameRequest("WHITE",newGame.gameID());
+        facade.joinGame(authData.authToken(), joinReq);
+    }
+
+    @Test
+    public void joinGameFailureNullColor() throws ResponseException {
+        facade.register(testReg);
+        var authData = facade.login(testLog);
+        GameData newGame = facade.createGame(authData.authToken(),testGameReq);
+        GameData.JoinGameRequest joinReq = new GameData.JoinGameRequest(null,newGame.gameID());
+        assertThrows(ResponseException.class, ()-> facade.joinGame(authData.authToken(),joinReq));
+    }
+
 
 }
