@@ -34,4 +34,11 @@ public class ServerFacadeTests {
         assertNotNull(authData.authToken());
     }
 
+    @Test
+    public void registerFailureNoUsername() throws ResponseException {
+        var authData = new UserData.RegisterRequest(
+                null,"forgotIt","test@mail.com");
+        assertThrows(ResponseException.class, () -> facade.register(authData));
+    }
+
 }
