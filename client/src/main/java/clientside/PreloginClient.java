@@ -11,7 +11,7 @@ import static ui.EscapeSequences.*;
 
 public class PreloginClient {
     private final ServerFacade server;
-    private static State state = State.SIGNEDOUT;
+    private State state;
     private AuthData authData = null;
 
     public record PrelogResult(String authToken, State state){};
@@ -20,14 +20,18 @@ public class PreloginClient {
         this.server = server;
     }
 
-    public PrelogResult run() {
+    public PrelogResult run(State s) {
 
+        state = s;
         Scanner scanner = new Scanner(System.in);
 
-        printPrompt();
-        String line = scanner.nextLine();
-        String result = eval(line);
-        System.out.print(SET_TEXT_COLOR_BLUE + result);
+        if (state == State.SIGNEDIN){return new PrelogResult(authData.authToken(),State.SIGNEDOUT);}
+        while (state == State.SIGNEDOUT) {
+            printPrompt();
+            String line = scanner.nextLine();
+            String result = eval(line);
+            System.out.print(SET_TEXT_COLOR_BLUE + result);
+        }
         if (authData != null) {
             return new PrelogResult(authData.authToken(), state);
         } else {return new PrelogResult(null, state);}
