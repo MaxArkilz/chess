@@ -29,7 +29,10 @@ public class PreloginClient {
         String line = scanner.nextLine();
         String result = eval(line);
         System.out.print(SET_TEXT_COLOR_BLUE + result);
-        return new PrelogResult(authData.authToken(), state);
+        if (authData != null) {
+            return new PrelogResult(authData.authToken(), state);
+        } else {return new PrelogResult(null, state);}
+
     }
 
     public String eval(String input) {
@@ -71,8 +74,8 @@ public class PreloginClient {
         String email = params[2];
         try {
             server.register(new UserData.RegisterRequest(username,password,email));
-            state = State.SIGNEDIN;
-            return "Registration successful. Signed in as " + username;
+            return SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_BLUE + "Registration successful as " + username + "."
+                    + RESET_TEXT_COLOR + RESET_BG_COLOR;
         } catch (ResponseException e) {
             return SET_TEXT_COLOR_RED + "Registration failed: "+ e.getMessage();
         }

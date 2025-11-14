@@ -1,5 +1,7 @@
 package clientSide;
 
+import model.GameData;
+
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -42,6 +44,9 @@ public class GameplayClient {
     }
 
     public void printBoard(int gameID, String color, String mode) {
+        GameData game = server.getGame(gameID);
+
+
 
 
     }

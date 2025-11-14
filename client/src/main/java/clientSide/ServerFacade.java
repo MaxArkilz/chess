@@ -66,6 +66,12 @@ public class ServerFacade {
         handleResponse(response, null);
     }
 
+    public GameData getGame(int gameID) {
+        var request = buildRequest("GET", "/game/" + gameID, gameID, null);
+        var response = sendRequest(request);
+        return handleResponse(response, GameData.class);
+    }
+
 
     //helper functions
     private static class GamesWrapper{
