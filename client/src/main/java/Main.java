@@ -7,6 +7,9 @@ import static ui.EscapeSequences.RESET_TEXT_COLOR;
 public class Main {
     private static State state = State.SIGNEDOUT;
     private static String authToken = null;
+    private static int gameID = 0;
+    private static String color = null;
+    private static String mode = null;
 
     public static void main(String[] args) {
         String serverUrl = "http://localhost:8080";
@@ -28,7 +31,14 @@ public class Main {
                 state = result.state();
             }
             if (state == State.SIGNEDIN) {
-                state = postlog.run(authToken);
+                PostloginClient.GameplayInfo result = postlog.run(authToken);
+                state = result.state();
+                gameID = result.gameId();
+                color = result.playerColor();
+                mode = result.mode();
+            }
+            if (state == State.GAMEMODE) {
+                state = game.run(gameID,color,mode);
             }
 
         }
