@@ -1,4 +1,4 @@
-package ClientSide;
+package clientside;
 import exception.ResponseException;
 
 import java.util.Arrays;
@@ -7,11 +7,9 @@ import static ui.EscapeSequences.*;
 public class GameplayClient {
 
 
-    private final ServerFacade server;
     private static State state = State.GAMEMODE;
 
     public GameplayClient(ServerFacade server) {
-        this.server = server;
     }
 
     public State run(int gameID, String color, String mode) {

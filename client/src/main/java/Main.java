@@ -1,4 +1,4 @@
-import ClientSide.*;
+import clientside.*;
 
 import static ui.EscapeSequences.RESET_TEXT_COLOR;
 

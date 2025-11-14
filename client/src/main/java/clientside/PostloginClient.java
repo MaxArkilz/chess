@@ -1,4 +1,4 @@
-package ClientSide;
+package clientside;
 
 import exception.ResponseException;
 import model.GameData;

@@ -1,4 +1,4 @@
-package ClientSide;
+package clientside;
 
 import com.google.gson.Gson;
 import exception.ResponseException;

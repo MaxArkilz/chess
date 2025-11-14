@@ -5,7 +5,7 @@ import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.*;
 import server.Server;
-import ClientSide.ServerFacade;
+import clientside.ServerFacade;
 import static org.junit.jupiter.api.Assertions.*;
 
 
