@@ -1,5 +1,6 @@
 package server;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
@@ -85,7 +86,7 @@ public class Server {
 
     private void getGame(@NotNull Context context) throws DataAccessException {
         int gameID = context.pathParamAsClass("gameID", Integer.class).get();
-        GameData result = gameService.getGame(gameID);
+        ChessGame result = gameService.getGame(gameID);
         context.status(200).json(result);
     }
 
@@ -144,4 +145,5 @@ public class Server {
         ctx.status(200).json("{}");
 
     }
+
 }

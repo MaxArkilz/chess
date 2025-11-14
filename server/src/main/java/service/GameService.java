@@ -48,7 +48,7 @@ public class GameService {
             throw new ResponseException(400, "Error: game already exists with that name");
         }
 
-        var newGame = new GameData(0,null,null,request.gameName(),null);
+        var newGame = new GameData(0,null,null,request.gameName(),new ChessGame());
         int newGameID = dao.createGame(newGame);
 
         return new GameData.CreateGameResponse(newGameID);
@@ -85,8 +85,8 @@ public class GameService {
         dao.updateGame(updatedGame);
     }
 
-    public GameData getGame(int gameID) throws DataAccessException {
+    public ChessGame getGame(int gameID) throws DataAccessException {
         GameData game = dao.getGame(gameID);
-        return game;
+        return game.game();
     }
 }

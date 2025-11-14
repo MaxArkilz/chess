@@ -1,12 +1,11 @@
 package clientSide;
-
+import chess.ChessGame;
 import model.GameData;
+import ui.EscapeSequences;
 
 import java.util.Arrays;
 import java.util.Scanner;
-
 import static ui.EscapeSequences.*;
-
 public class GameplayClient {
 
 
@@ -24,9 +23,10 @@ public class GameplayClient {
 
         printBoard(gameID, color, mode);
         printPrompt();
-//        String line = scanner.nextLine();
-//        String result = eval(line);
-//        System.out.print(SET_TEXT_COLOR_BLUE + result);
+
+        String line = scanner.nextLine();
+        String result = eval(line);
+        System.out.print(SET_TEXT_COLOR_BLUE + result);
         return State.GAMEMODE;
     }
 
@@ -40,14 +40,49 @@ public class GameplayClient {
     }
 
     public String eval(String input) {
-        return null;
+
+        ;
     }
 
     public void printBoard(int gameID, String color, String mode) {
-        GameData game = server.getGame(gameID);
 
-
-
-
+        String[][] board = {
+                {"r","n","b","q","k","b","n","r"},
+                {"p","p","p","p","p","p","p","p"},
+                {"","","","","","","",""},
+                {"","","","","","","",""},
+                {"","","","","","","",""},
+                {"","","","","","","",""},
+                {"P","P","P","P","P","P","P","P"},
+                {"R","N","B","Q","K","B","N","R"}
+        };
+        for (int row = 0; row < 8; row ++) {
+            for (int col = 0; col < 8; col++) {
+                boolean lightSquare = (row + col) % 2 == 0;
+                String square = lightSquare ? SET_BG_COLOR_LIGHT_GREY : SET_BG_COLOR_DARK_GREY;
+                String piece = pieceUpgrades(board[row][col]);
+                System.out.print(square + piece + RESET_BG_COLOR);
+            }
+            System.out.println();
+        }
     }
+
+    private static String pieceUpgrades(String piece) {
+        return switch (piece) {
+            case "K" -> WHITE_KING;
+            case "Q" -> WHITE_QUEEN;
+            case "R" -> WHITE_ROOK;
+            case "B" -> WHITE_BISHOP;
+            case "N" -> WHITE_KNIGHT;
+            case "P" -> WHITE_PAWN;
+            case "k" -> BLACK_KING;
+            case "q" -> BLACK_QUEEN;
+            case "r" -> BLACK_ROOK;
+            case "b" -> BLACK_BISHOP;
+            case "n" -> BLACK_KNIGHT;
+            case "p" -> BLACK_PAWN;
+            default   -> EMPTY;
+        };
+    }
+
 }

@@ -1,5 +1,6 @@
 package service;
 
+import chess.ChessGame;
 import dataaccess.DataAccessException;
 import dataaccess.DataAccessMemory;
 import exception.ResponseException;
@@ -124,5 +125,12 @@ public class GameServiceTests {
 
         ResponseException ex = Assertions.assertThrows(ResponseException.class, () -> gameService.joinGame(dadToken, request));
         Assertions.assertEquals(403, ex.getStatusCode());
+    }
+
+    @Test
+    public void getGame() throws DataAccessException {
+        int gameID = dao.createGame(new GameData(0, "white","black", "test", new ChessGame()));
+        ChessGame data = gameService.getGame(gameID);
+        Assertions.assertNotNull(data);
     }
 }
