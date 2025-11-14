@@ -30,14 +30,14 @@ public class Main {
                 authToken = result.authToken();
                 state = result.state();
             }
-            if (state == State.SIGNEDIN) {
+            else if (state == State.SIGNEDIN) {
                 PostloginClient.GameplayInfo result = postlog.run(authToken);
                 state = result.state();
                 gameID = result.gameId();
                 color = result.playerColor();
                 mode = result.mode();
             }
-            if (state == State.GAMEMODE) {
+            else if (state == State.GAMEMODE) {
                 state = game.run(gameID,color,mode);
             }
 

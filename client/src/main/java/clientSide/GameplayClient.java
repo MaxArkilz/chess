@@ -1,7 +1,7 @@
 package clientSide;
 import chess.ChessGame;
+import exception.ResponseException;
 import model.GameData;
-import ui.EscapeSequences;
 
 import java.util.Arrays;
 import java.util.Scanner;
@@ -27,60 +27,113 @@ public class GameplayClient {
         String line = scanner.nextLine();
         String result = eval(line);
         System.out.print(SET_TEXT_COLOR_BLUE + result);
-        return State.GAMEMODE;
+        return state;
     }
 
     public String help() {
-        return null;
+        return SET_TEXT_COLOR_BLUE + """
+                \nquit  - close the program
+                help   - show this menu
+                """;
+
     }
 
     public void printPrompt() {
-        System.out.print("\n" + RESET_TEXT_COLOR
+        System.out.print("\n\n" + RESET_TEXT_COLOR
                 +"["+ state+"]" + ">>> " + SET_TEXT_COLOR_GREEN);
     }
 
     public String eval(String input) {
+        try {
+            String[] tokens = input.toLowerCase().split(" ");
+            String cmd = (tokens.length > 0) ? tokens[0] : "help";
+            String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
+            return switch (cmd) {
+                case "quit" -> quit();
+                default -> help();
+            };
+        } catch (ResponseException e) {
+            return SET_TEXT_COLOR_RED + e.getMessage();
+        }
+    }
 
-        ;
+    public String quit() {
+        state = State.EXIT;
+        return SET_TEXT_COLOR_MAGENTA + "Goodbye!\n" + RESET_TEXT_COLOR;
     }
 
     public void printBoard(int gameID, String color, String mode) {
 
-        String[][] board = {
-                {"r","n","b","q","k","b","n","r"},
-                {"p","p","p","p","p","p","p","p"},
-                {"","","","","","","",""},
-                {"","","","","","","",""},
-                {"","","","","","","",""},
-                {"","","","","","","",""},
-                {"P","P","P","P","P","P","P","P"},
-                {"R","N","B","Q","K","B","N","R"}
-        };
+        String[][] board;
+        String[] columns;
+        String[] rows;
+        if (color.equalsIgnoreCase("WHITE")) {
+            board = new String[][]{
+                    {"r","n","b","q","k","b","n","r"},
+                    {"p","p","p","p","p","p","p","p"},
+                    {"","","","","","","",""},
+                    {"","","","","","","",""},
+                    {"","","","","","","",""},
+                    {"","","","","","","",""},
+                    {"P","P","P","P","P","P","P","P"},
+                    {"R","N","B","Q","K","B","N","R"}
+            };
+            columns = new String[]{"A","B","C","D","E","F","G","H"};
+            rows = new String[]{"8","7","6","5","4","3","2","1"};
+        } else {
+            board = new String[][]{
+                    {"R","N","B","Q","K","B","N","R"},
+                    {"P","P","P","P","P","P","P","P"},
+                    {"","","","","","","",""},
+                    {"","","","","","","",""},
+                    {"","","","","","","",""},
+                    {"","","","","","","",""},
+                    {"p","p","p","p","p","p","p","p"},
+                    {"r","n","b","q","k","b","n","r"}
+            };
+            columns = new String[]{"H","G","F","E","D","C","B","A"};
+            rows = new String[]{"1","2","3","4","5","6","7","8"};
+        }
+
+        System.out.print(SET_BG_COLOR_BLACK + "   "+"\u2004");
+        for (String col : columns) {
+            System.out.print(SET_TEXT_COLOR_WHITE+" "+col+"\u2003");
+        }
+        System.out.println();
+
         for (int row = 0; row < 8; row ++) {
+            System.out.print(SET_TEXT_COLOR_WHITE + " " +rows[row]+" ");
             for (int col = 0; col < 8; col++) {
                 boolean lightSquare = (row + col) % 2 == 0;
                 String square = lightSquare ? SET_BG_COLOR_LIGHT_GREY : SET_BG_COLOR_DARK_GREY;
                 String piece = pieceUpgrades(board[row][col]);
                 System.out.print(square + piece + RESET_BG_COLOR);
             }
+            System.out.print(SET_BG_COLOR_BLACK + SET_TEXT_COLOR_WHITE + " " + rows[row] + " ");
             System.out.println();
         }
+        System.out.print(SET_BG_COLOR_BLACK + "   "+"\u2004");
+        for (String col : columns) {
+            System.out.print(SET_TEXT_COLOR_WHITE+" "+col+"\u2003");
+        }
+        System.out.println();
+        System.out.print(RESET_BG_COLOR);
     }
 
     private static String pieceUpgrades(String piece) {
         return switch (piece) {
-            case "K" -> WHITE_KING;
-            case "Q" -> WHITE_QUEEN;
-            case "R" -> WHITE_ROOK;
-            case "B" -> WHITE_BISHOP;
-            case "N" -> WHITE_KNIGHT;
-            case "P" -> WHITE_PAWN;
-            case "k" -> BLACK_KING;
-            case "q" -> BLACK_QUEEN;
-            case "r" -> BLACK_ROOK;
-            case "b" -> BLACK_BISHOP;
-            case "n" -> BLACK_KNIGHT;
-            case "p" -> BLACK_PAWN;
+            case "K" -> SET_TEXT_COLOR_WHITE + WHITE_KING;
+            case "Q" -> SET_TEXT_COLOR_WHITE + WHITE_QUEEN;
+            case "R" -> SET_TEXT_COLOR_WHITE + WHITE_ROOK;
+            case "B" -> SET_TEXT_COLOR_WHITE + WHITE_BISHOP;
+            case "N" -> SET_TEXT_COLOR_WHITE + WHITE_KNIGHT;
+            case "P" -> SET_TEXT_COLOR_WHITE + WHITE_PAWN;
+            case "k" -> SET_TEXT_COLOR_BLACK + BLACK_KING;
+            case "q" -> SET_TEXT_COLOR_BLACK + BLACK_QUEEN;
+            case "r" -> SET_TEXT_COLOR_BLACK + BLACK_ROOK;
+            case "b" -> SET_TEXT_COLOR_BLACK + BLACK_BISHOP;
+            case "n" -> SET_TEXT_COLOR_BLACK + BLACK_KNIGHT;
+            case "p" -> SET_TEXT_COLOR_BLACK + BLACK_PAWN;
             default   -> EMPTY;
         };
     }

@@ -27,8 +27,6 @@ public class PostloginClient {
     public GameplayInfo run(String auth) {
 
         authToken = auth;
-
-        System.out.print(help());
         Scanner scanner = new Scanner(System.in);
 
         printPrompt();
@@ -53,7 +51,7 @@ public class PostloginClient {
     }
 
     public void printPrompt() {
-        System.out.print("\n" + RESET_TEXT_COLOR
+        System.out.print("\n\n" + RESET_TEXT_COLOR
                 +"["+ state+"]" + ">>> " + SET_TEXT_COLOR_GREEN);
     }
 
@@ -83,8 +81,9 @@ public class PostloginClient {
         String gameName = params[0];
         try {
             GameData gameData = server.createGame(authToken,new GameData.CreateGameRequest(gameName));
-            return SET_TEXT_COLOR_BLUE +
-                    "Successfully created game: " + gameName + " with game ID: " + gameData.gameID();
+            return SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_WHITE +
+                    " Successfully created game: " + gameName + " with game ID: " + gameData.gameID()+ " "
+                    + RESET_BG_COLOR+ RESET_TEXT_COLOR;
         } catch (ResponseException e) {
             return SET_TEXT_COLOR_RED + "Game creation failed: " + e.getMessage();
         }
@@ -97,10 +96,15 @@ public class PostloginClient {
                     SET_BG_COLOR_BLACK + SET_TEXT_COLOR_WHITE +
                     " GAMES LIST " +
                     RESET_BG_COLOR + RESET_TEXT_COLOR);
+            int lineNum = 1;
             for (GameData game : gameList) {
-                System.out.println(SET_TEXT_COLOR_BLACK + "Name: "+game.gameName() + " ID: "+game.gameID());
+                System.out.println(SET_TEXT_COLOR_BLACK +
+                        lineNum + "-- " + "Name: "+game.gameName() + " | ID: " + game.gameID() + " | White Player: "
+                + game.whiteUsername() + " | Black Player: " + game.blackUsername());
+                lineNum += 1;
             }
-            return SET_TEXT_COLOR_BLUE + "All games printed";
+            return SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_WHITE + " End of games list "
+                    + RESET_BG_COLOR+ RESET_TEXT_COLOR;
         } catch (ResponseException e) {
             return SET_TEXT_COLOR_RED + "Failed to list games: " + e.getMessage();
         }
@@ -120,7 +124,8 @@ public class PostloginClient {
             gameID = ID;
             mode = "join";
             playerColor = color;
-            return SET_TEXT_COLOR_BLUE + "Successfully joined game: " + ID + " as " + color;
+            return SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_WHITE + "Successfully joined game: "
+                    + ID + " as " + color + RESET_BG_COLOR+ RESET_TEXT_COLOR+ "\n\n";
         } catch (ResponseException e) {
             return SET_TEXT_COLOR_RED + "Failed to join game" + ID + ": " + e.getMessage();
         }
@@ -130,16 +135,31 @@ public class PostloginClient {
         if (params.length < 1){
             return SET_TEXT_COLOR_RED +
                     "Usage: observe <ID>. (Input game id).";}
-        String s = params[0];
-        int ID = Integer.parseInt(s);
-
+        int ID;
         try {
-//            server.joinGame(authToken,new GameData.JoinGameRequest(null,ID));
+            String s = params[0];
+            ID = Integer.parseInt(s);
+        } catch (Exception e){
+            return SET_TEXT_COLOR_RED + "ID must be an integer.";
+        }
+        try {
+            List<GameData> gameList = server.listGames(authToken);
+            boolean gameExists = false;
+            for(GameData game : gameList){
+                if (game.gameID() == ID) {
+                    gameExists = true;
+                    break;
+                }
+            }
+            if (!gameExists) {
+                return SET_TEXT_COLOR_RED + "No game found with ID " + ID;
+            }
             state = State.GAMEMODE;
             gameID = ID;
             mode = "observe";
             playerColor = "WHITE";
-            return SET_TEXT_COLOR_BLUE + "Now observing game: " + ID;
+            return SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_WHITE + " Now observing game: " + ID + " " +
+                    RESET_BG_COLOR+ RESET_TEXT_COLOR+ "\n\n";
         } catch (ResponseException e) {
             return SET_TEXT_COLOR_RED + "Failed to launch game" + ID + ": " + e.getMessage();
         }
@@ -147,7 +167,8 @@ public class PostloginClient {
 
     public String logout() {
         state = State.SIGNEDOUT;
-        return SET_TEXT_COLOR_BLUE + "Successfully logged out";
+        return SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_WHITE + "Successfully logged out"
+                +RESET_BG_COLOR+ RESET_TEXT_COLOR;
     }
 
     public String quit() {

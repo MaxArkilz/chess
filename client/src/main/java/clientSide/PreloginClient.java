@@ -22,7 +22,6 @@ public class PreloginClient {
 
     public PrelogResult run() {
 
-        System.out.print(help());
         Scanner scanner = new Scanner(System.in);
 
         printPrompt();
@@ -32,7 +31,6 @@ public class PreloginClient {
         if (authData != null) {
             return new PrelogResult(authData.authToken(), state);
         } else {return new PrelogResult(null, state);}
-
     }
 
     public String eval(String input) {
@@ -47,7 +45,7 @@ public class PreloginClient {
                 default -> help();
             };
         } catch (Exception e) {
-            return SET_TEXT_COLOR_RED + "Error: " + e.getMessage();
+            return SET_TEXT_COLOR_RED + e.getMessage();
         }
     }
 
@@ -61,7 +59,7 @@ public class PreloginClient {
     }
 
     private void printPrompt() {
-        System.out.print("\n" + RESET_TEXT_COLOR
+        System.out.print("\n\n" + RESET_TEXT_COLOR
                 +"["+ state+"]" + ">>> " + SET_TEXT_COLOR_GREEN);
     }
 
@@ -73,8 +71,11 @@ public class PreloginClient {
         String password = params[1];
         String email = params[2];
         try {
-            server.register(new UserData.RegisterRequest(username,password,email));
-            return SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_BLUE + "Registration successful as " + username + "."
+            AuthData auth = server.register(new UserData.RegisterRequest(username,password,email));
+            authData = auth;
+            state = State.SIGNEDIN;
+            return SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_WHITE +
+                    "  Registration successful. Logged in as " + username + ".  "
                     + RESET_TEXT_COLOR + RESET_BG_COLOR;
         } catch (ResponseException e) {
             return SET_TEXT_COLOR_RED + "Registration failed: "+ e.getMessage();
@@ -90,7 +91,8 @@ public class PreloginClient {
         try {
             authData = server.login(new UserData.LoginRequest(username,password));
             state = State.SIGNEDIN;
-            return "Login successful. Welcome back "+ username;
+            return SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_WHITE + " Login successful. Welcome back "+ username + " "
+                    + RESET_TEXT_COLOR + RESET_BG_COLOR;
         } catch (Exception e) {
             return SET_TEXT_COLOR_RED + "Login failed: " + e.getMessage();
         }
@@ -98,6 +100,6 @@ public class PreloginClient {
 
     public String quit() {
         state = State.EXIT;
-        return SET_TEXT_COLOR_MAGENTA + "Goodbye!\n" + RESET_TEXT_COLOR;
+        return SET_TEXT_COLOR_BLUE + "Goodbye!\n" + RESET_TEXT_COLOR;
     }
 }
