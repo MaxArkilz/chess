@@ -65,22 +65,28 @@ public class GameService {
         String username = auth.username();
 
 
-        if (!request.playerColor().equals("WHITE") && !request.playerColor().equals("BLACK")) {
+        if (!request.playerColor().equalsIgnoreCase("WHITE")
+                && !request.playerColor().equalsIgnoreCase("BLACK")) {
             throw new ResponseException(400, "Error: bad request");}
         if (game == null) {
             throw new ResponseException(400, "Error: game not found");}
 
-        if ((request.playerColor().equals("WHITE")
+        if ((request.playerColor().equalsIgnoreCase("WHITE")
                 && game.whiteUsername() != null)
-                || (request.playerColor().equals("BLACK")
+                || (request.playerColor().equalsIgnoreCase("BLACK")
                 && game.blackUsername() != null)){
             throw new ResponseException(403, "Error: already taken");}
 
         GameData updatedGame;
-        if (request.playerColor().equals("WHITE")) {
+        if (request.playerColor().equalsIgnoreCase("WHITE")) {
             updatedGame = new GameData(game.gameID(), username, game.blackUsername(), game.gameName(), game.game());
         } else {
             updatedGame = new GameData(game.gameID(), game.whiteUsername(), username, game.gameName(), game.game());}
         dao.updateGame(updatedGame);
+    }
+
+    public GameData getGame(int gameID) throws DataAccessException {
+        GameData game = dao.getGame(gameID);
+        return game;
     }
 }

@@ -80,7 +80,15 @@ public class Server {
         javalin.get("/game", this::listGames);
         javalin.post("/game", this::createGame);
         javalin.put("/game", this::joinGame);
+        javalin.get("/game", this::getGame);
     }
+
+    private void getGame(@NotNull Context context) throws DataAccessException {
+        int gameID = context.pathParamAsClass("gameID", Integer.class).get();
+        GameData result = gameService.getGame(gameID);
+        context.status(200).json(result);
+    }
+
     public int run(int desiredPort) {
         javalin.start(desiredPort);
         return javalin.port();
