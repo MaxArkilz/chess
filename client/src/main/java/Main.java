@@ -24,19 +24,19 @@ public class Main {
         System.out.println(RESET_TEXT_COLOR + "\n ♕ Welcome to 240 chess. Type 'Help' to get started. ♛ ");
         while (state != State.EXIT) {
             if (state == State.SIGNEDOUT) {
-                PreloginClient.PrelogResult result = prelog.run();
+                PreloginClient.PrelogResult result = prelog.run(state);
                 authToken = result.authToken();
                 state = result.state();
             }
             else if (state == State.SIGNEDIN) {
-                PostloginClient.GameplayInfo result = postlog.run(authToken);
+                PostloginClient.GameplayInfo result = postlog.run(authToken, state);
                 state = result.state();
                 gameID = result.gameId();
                 color = result.playerColor();
                 mode = result.mode();
             }
             else if (state == State.GAMEMODE) {
-                state = game.run(gameID,color,mode);
+                state = game.run(gameID,color,mode,state);
             }
 
         }

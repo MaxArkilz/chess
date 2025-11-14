@@ -12,7 +12,7 @@ import static ui.EscapeSequences.*;
 public class PostloginClient {
 
     private final ServerFacade server;
-    private static State state = State.SIGNEDIN;
+    private State state;
     private String authToken = null;
     private int gameID = 0;
     private String playerColor = null;
@@ -24,15 +24,19 @@ public class PostloginClient {
         this.server = server;
     }
 
-    public GameplayInfo run(String auth) {
+    public GameplayInfo run(String auth, State s) {
 
         authToken = auth;
+        state = s;
         Scanner scanner = new Scanner(System.in);
 
-        printPrompt();
-        String line = scanner.nextLine();
-        String result = eval(line);
-        System.out.print(SET_TEXT_COLOR_BLUE + result);
+        if (state == State.SIGNEDOUT){return new GameplayInfo(State.SIGNEDOUT,gameID,mode,playerColor);}
+        while (state == State.SIGNEDIN) {
+            printPrompt();
+            String line = scanner.nextLine();
+            String result = eval(line);
+            System.out.print(SET_TEXT_COLOR_BLUE + result);
+        }
 
         return new GameplayInfo(state, gameID, mode, playerColor);
     }
@@ -82,7 +86,7 @@ public class PostloginClient {
         try {
             GameData gameData = server.createGame(authToken,new GameData.CreateGameRequest(gameName));
             return SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_WHITE +
-                    " Successfully created game: " + gameName + " with game ID: " + gameData.gameID()+ " "
+                    " Successfully created game: " + gameName + " "
                     + RESET_BG_COLOR+ RESET_TEXT_COLOR;
         } catch (ResponseException e) {
             return SET_TEXT_COLOR_RED + "Game creation failed: " + e.getMessage();
@@ -99,7 +103,7 @@ public class PostloginClient {
             int lineNum = 1;
             for (GameData game : gameList) {
                 System.out.println(SET_TEXT_COLOR_BLACK +
-                        lineNum + "-- " + "Name: "+game.gameName() + " | ID: " + game.gameID() + " | White Player: "
+                        lineNum + "-- " + "Name: "+game.gameName() + " | White Player: "
                 + game.whiteUsername() + " | Black Player: " + game.blackUsername());
                 lineNum += 1;
             }
@@ -114,8 +118,14 @@ public class PostloginClient {
         if (params.length < 2){
             return SET_TEXT_COLOR_RED +
                     "Usage: join <ID> [WHITE|BLACK]. (Input game id and choose WHITE or BLACK).";}
-        String s = params[0];
-        int id = Integer.parseInt(s);
+
+        int id;
+        try {
+            String s = params[0];
+            id = Integer.parseInt(s);
+        } catch (Exception e){
+            return SET_TEXT_COLOR_RED + "ID must be an integer.";
+        }
         String color = params[1];
 
         try {
