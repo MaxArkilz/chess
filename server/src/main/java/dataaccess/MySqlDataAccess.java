@@ -6,6 +6,7 @@ import exception.ResponseException;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
+import org.jetbrains.annotations.Nullable;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -112,23 +113,28 @@ public class MySqlDataAccess implements DataAccess{
             ps.setInt(1,gameID);
 
 
-            try (var rs = ps.executeQuery()){
-                if (rs.next()) {
-                    var json = rs.getString("chessGame");
-                    var game = new Gson().fromJson(json, ChessGame.class);
-
-                    return new GameData(
-                            rs.getInt("gameID"),
-                            rs.getString("whiteUsername"),
-                            rs.getString("blackUsername"),
-                            rs.getString("name"),
-                            game
-                    );
-                }
-                return null;
-            }
+            return getGameData(ps);
         } catch (SQLException ex) {
             throw new DataAccessException("Error getting game" + ex.getMessage());
+        }
+    }
+
+    @Nullable
+    private GameData getGameData(PreparedStatement ps) throws SQLException {
+        try (var rs = ps.executeQuery()){
+            if (rs.next()) {
+                var json = rs.getString("chessGame");
+                var game = new Gson().fromJson(json, ChessGame.class);
+
+                return new GameData(
+                        rs.getInt("gameID"),
+                        rs.getString("whiteUsername"),
+                        rs.getString("blackUsername"),
+                        rs.getString("name"),
+                        game
+                );
+            }
+            return null;
         }
     }
 
@@ -140,21 +146,7 @@ public class MySqlDataAccess implements DataAccess{
             var ps = connection.prepareStatement(statement);
             ps.setString(1, gameName);
 
-            try (var rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    var json = rs.getString("chessGame");
-                    var game = new Gson().fromJson(json, ChessGame.class);
-
-                    return new GameData(
-                            rs.getInt("gameID"),
-                            rs.getString("whiteUsername"),
-                            rs.getString("blackUsername"),
-                            rs.getString("name"),
-                            game
-                    );
-                }
-                return null; // No game found with this name
-            }
+            return getGameData(ps);
         } catch (SQLException ex) {
             throw new DataAccessException("Error getting game by name: " + ex.getMessage());
         }

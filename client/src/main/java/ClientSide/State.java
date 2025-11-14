@@ -1,4 +1,4 @@
-package clientSide;
+package ClientSide;
 
 public enum State {
     SIGNEDOUT,

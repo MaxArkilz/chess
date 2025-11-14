@@ -1,4 +1,4 @@
-package clientSide;
+package ClientSide;
 
 import exception.ResponseException;
 import model.AuthData;

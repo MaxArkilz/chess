@@ -1,7 +1,5 @@
-package clientSide;
-import chess.ChessGame;
+package ClientSide;
 import exception.ResponseException;
-import model.GameData;
 
 import java.util.Arrays;
 import java.util.Scanner;

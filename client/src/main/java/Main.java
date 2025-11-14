@@ -1,6 +1,4 @@
-import chess.*;
-
-import clientSide.*;
+import ClientSide.*;
 
 import static ui.EscapeSequences.RESET_TEXT_COLOR;
 

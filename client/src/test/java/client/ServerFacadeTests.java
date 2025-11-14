@@ -5,7 +5,7 @@ import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.*;
 import server.Server;
-import clientSide.ServerFacade;
+import ClientSide.ServerFacade;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -33,8 +33,11 @@ public class ServerFacadeTests {
         System.out.println("Started test HTTP server on " + port);
         facade = new ServerFacade("http://localhost:" + port);
         facade.clearData();
+    }
 
-
+    @BeforeEach
+    public void dataWipe(){
+        facade.clearData();
     }
 
     @AfterAll

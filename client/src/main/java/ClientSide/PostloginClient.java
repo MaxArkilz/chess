@@ -1,4 +1,4 @@
-package clientSide;
+package ClientSide;
 
 import exception.ResponseException;
 import model.GameData;
@@ -115,19 +115,19 @@ public class PostloginClient {
             return SET_TEXT_COLOR_RED +
                     "Usage: join <ID> [WHITE|BLACK]. (Input game id and choose WHITE or BLACK).";}
         String s = params[0];
-        int ID = Integer.parseInt(s);
+        int id = Integer.parseInt(s);
         String color = params[1];
 
         try {
-            server.joinGame(authToken,new GameData.JoinGameRequest(color, ID));
+            server.joinGame(authToken,new GameData.JoinGameRequest(color, id));
             state = State.GAMEMODE;
-            gameID = ID;
+            gameID = id;
             mode = "join";
             playerColor = color;
             return SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_WHITE + "Successfully joined game: "
-                    + ID + " as " + color + RESET_BG_COLOR+ RESET_TEXT_COLOR+ "\n\n";
+                    + id + " as " + color + RESET_BG_COLOR+ RESET_TEXT_COLOR+ "\n\n";
         } catch (ResponseException e) {
-            return SET_TEXT_COLOR_RED + "Failed to join game" + ID + ": " + e.getMessage();
+            return SET_TEXT_COLOR_RED + "Failed to join game" + id + ": " + e.getMessage();
         }
     }
 
@@ -135,10 +135,10 @@ public class PostloginClient {
         if (params.length < 1){
             return SET_TEXT_COLOR_RED +
                     "Usage: observe <ID>. (Input game id).";}
-        int ID;
+        int id;
         try {
             String s = params[0];
-            ID = Integer.parseInt(s);
+            id = Integer.parseInt(s);
         } catch (Exception e){
             return SET_TEXT_COLOR_RED + "ID must be an integer.";
         }
@@ -146,22 +146,22 @@ public class PostloginClient {
             List<GameData> gameList = server.listGames(authToken);
             boolean gameExists = false;
             for(GameData game : gameList){
-                if (game.gameID() == ID) {
+                if (game.gameID() == id) {
                     gameExists = true;
                     break;
                 }
             }
             if (!gameExists) {
-                return SET_TEXT_COLOR_RED + "No game found with ID " + ID;
+                return SET_TEXT_COLOR_RED + "No game found with ID " + id;
             }
             state = State.GAMEMODE;
-            gameID = ID;
+            gameID = id;
             mode = "observe";
             playerColor = "WHITE";
-            return SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_WHITE + " Now observing game: " + ID + " " +
+            return SET_BG_COLOR_DARK_GREY + SET_TEXT_COLOR_WHITE + " Now observing game: " + id + " " +
                     RESET_BG_COLOR+ RESET_TEXT_COLOR+ "\n\n";
         } catch (ResponseException e) {
-            return SET_TEXT_COLOR_RED + "Failed to launch game" + ID + ": " + e.getMessage();
+            return SET_TEXT_COLOR_RED + "Failed to launch game" + id + ": " + e.getMessage();
         }
     }
 
