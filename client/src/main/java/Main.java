@@ -6,6 +6,7 @@ import static ui.EscapeSequences.RESET_TEXT_COLOR;
 
 public class Main {
     private static State state = State.SIGNEDOUT;
+    private static String authToken = null;
 
     public static void main(String[] args) {
         String serverUrl = "http://localhost:8080";
@@ -22,13 +23,12 @@ public class Main {
         System.out.println(RESET_TEXT_COLOR + "\n ♕ Welcome to 240 chess. Type 'Help' to get started. ♛ ");
         while (state != State.EXIT) {
             if (state == State.SIGNEDOUT) {
-                state = prelog.run();
+                PreloginClient.PrelogResult result = prelog.run();
+                authToken = result.authToken();
+                state = result.state();
             }
             if (state == State.SIGNEDIN) {
-                state = postlog.run();
-            }
-            if (state == State.GAMEMODE){
-                state = game.run();
+                state = postlog.run(authToken);
             }
 
         }

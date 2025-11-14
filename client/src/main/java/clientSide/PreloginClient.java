@@ -10,15 +10,18 @@ import java.util.Scanner;
 import static ui.EscapeSequences.*;
 
 public class PreloginClient {
-
     private final ServerFacade server;
     private static State state = State.SIGNEDOUT;
+    private AuthData authData = null;
+
+    public static PrelogResult PrelogResult;
+    public record PrelogResult(String authToken, State state){};
 
     public PreloginClient(ServerFacade server) throws ResponseException {
         this.server = server;
     }
 
-    public State run() {
+    public PrelogResult run() {
 
         System.out.print(help());
         Scanner scanner = new Scanner(System.in);
@@ -27,7 +30,7 @@ public class PreloginClient {
         String line = scanner.nextLine();
         String result = eval(line);
         System.out.print(SET_TEXT_COLOR_BLUE + result);
-        return state;
+        return new PrelogResult(authData.authToken(), state);
     }
 
     public String eval(String input) {
@@ -83,7 +86,7 @@ public class PreloginClient {
         String username = params[0];
         String password = params[1];
         try {
-            server.login(new UserData.LoginRequest(username,password));
+            authData = server.login(new UserData.LoginRequest(username,password));
             state = State.SIGNEDIN;
             return "Login successful. Welcome back "+ username;
         } catch (Exception e) {
