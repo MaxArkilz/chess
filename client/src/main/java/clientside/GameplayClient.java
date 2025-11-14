@@ -7,14 +7,15 @@ import static ui.EscapeSequences.*;
 public class GameplayClient {
 
 
-    private static State state = State.GAMEMODE;
+    private static State state;
 
     public GameplayClient(ServerFacade server) {
     }
 
-    public State run(int gameID, String color, String mode) {
+    public State run(int gameID, String color, String mode, State s) {
 
 //        System.out.print(help());
+        state = s;
         Scanner scanner = new Scanner(System.in);
 
         printBoard(gameID, color, mode);
@@ -28,7 +29,7 @@ public class GameplayClient {
 
     public String help() {
         return SET_TEXT_COLOR_BLUE + """
-                \nquit  - close the program
+                \nexit  - exit this game
                 help   - show this menu
                 """;
 
@@ -45,7 +46,7 @@ public class GameplayClient {
             String cmd = (tokens.length > 0) ? tokens[0] : "help";
             String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
-                case "quit" -> quit();
+                case "exit" -> exit();
                 default -> help();
             };
         } catch (ResponseException e) {
@@ -53,9 +54,9 @@ public class GameplayClient {
         }
     }
 
-    public String quit() {
-        state = State.EXIT;
-        return SET_TEXT_COLOR_MAGENTA + "Goodbye!\n" + RESET_TEXT_COLOR;
+    public String exit() {
+        state = State.SIGNEDIN;
+        return SET_TEXT_COLOR_MAGENTA + "Returning to home!\n" + RESET_TEXT_COLOR;
     }
 
     public void printBoard(int gameID, String color, String mode) {
@@ -101,7 +102,12 @@ public class GameplayClient {
             System.out.print(SET_TEXT_COLOR_WHITE + " " +rows[row]+" ");
             for (int col = 0; col < 8; col++) {
                 boolean lightSquare = (row + col) % 2 == 0;
-                String square = lightSquare ? SET_BG_COLOR_LIGHT_GREY : SET_BG_COLOR_DARK_GREY;
+                String br;
+                String tr;
+                if (color.equalsIgnoreCase("white")){
+                    br = SET_BG_COLOR_LIGHT_GREY;
+                    tr=SET_BG_COLOR_DARK_GREY;} else {br=SET_BG_COLOR_DARK_GREY;tr=SET_BG_COLOR_LIGHT_GREY;}
+                String square = lightSquare ? br : tr;
                 String piece = pieceUpgrades(board[row][col]);
                 System.out.print(square + piece + RESET_BG_COLOR);
             }
