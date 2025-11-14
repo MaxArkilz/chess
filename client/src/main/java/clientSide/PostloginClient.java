@@ -14,12 +14,17 @@ public class PostloginClient {
     private final ServerFacade server;
     private static State state = State.SIGNEDIN;
     private String authToken = null;
+    private int gameID = 0;
+    private String playerColor = null;
+    private String mode = null;
+
+    public record GameplayInfo(State state, int gameId, String mode, String playerColor) {}
 
     public PostloginClient(ServerFacade server) {
         this.server = server;
     }
 
-    public State run(String auth) {
+    public GameplayInfo run(String auth) {
 
         authToken = auth;
 
@@ -30,7 +35,8 @@ public class PostloginClient {
         String line = scanner.nextLine();
         String result = eval(line);
         System.out.print(SET_TEXT_COLOR_BLUE + result);
-        return state;
+
+        return new GameplayInfo(state, gameID, mode, playerColor);
     }
 
     public String help() {
@@ -77,7 +83,8 @@ public class PostloginClient {
         String gameName = params[0];
         try {
             GameData gameData = server.createGame(authToken,new GameData.CreateGameRequest(gameName));
-            return "Successfully created game: " + gameName + " with game ID: " + gameData.gameID();
+            return SET_TEXT_COLOR_BLUE +
+                    "Successfully created game: " + gameName + " with game ID: " + gameData.gameID();
         } catch (ResponseException e) {
             return SET_TEXT_COLOR_RED + "Game creation failed: " + e.getMessage();
         }
@@ -93,26 +100,59 @@ public class PostloginClient {
             for (GameData game : gameList) {
                 System.out.println(SET_TEXT_COLOR_BLACK + "Name: "+game.gameName() + " ID: "+game.gameID());
             }
-            return "All games printed";
+            return SET_TEXT_COLOR_BLUE + "All games printed";
         } catch (ResponseException e) {
             return SET_TEXT_COLOR_RED + "Failed to list games: " + e.getMessage();
         }
     }
 
     public String join(String[] params) {
-        return null;
+        if (params.length < 2){
+            return SET_TEXT_COLOR_RED +
+                    "Usage: join <ID> [WHITE|BLACK]. (Input game id and choose WHITE or BLACK).";}
+        String s = params[0];
+        int ID = Integer.parseInt(s);
+        String color = params[1];
+
+        try {
+            server.joinGame(authToken,new GameData.JoinGameRequest(color, ID));
+            state = State.GAMEMODE;
+            gameID = ID;
+            mode = "join";
+            playerColor = color;
+            return SET_TEXT_COLOR_BLUE + "Successfully joined game: " + ID + " as " + color;
+        } catch (ResponseException e) {
+            return SET_TEXT_COLOR_RED + "Failed to join game" + ID + ": " + e.getMessage();
+        }
     }
 
     public String observe(String[] params) {
-        return null;
+        if (params.length < 1){
+            return SET_TEXT_COLOR_RED +
+                    "Usage: observe <ID>. (Input game id).";}
+        String s = params[0];
+        int ID = Integer.parseInt(s);
+
+        try {
+//            server.joinGame(authToken,new GameData.JoinGameRequest(null,ID));
+            state = State.GAMEMODE;
+            gameID = ID;
+            mode = "observe";
+            playerColor = "WHITE";
+            return SET_TEXT_COLOR_BLUE + "Now observing game: " + ID;
+        } catch (ResponseException e) {
+            return SET_TEXT_COLOR_RED + "Failed to launch game" + ID + ": " + e.getMessage();
+        }
     }
 
     public String logout() {
-        return null;
+        state = State.SIGNEDOUT;
+        return SET_TEXT_COLOR_BLUE + "Successfully logged out";
     }
 
     public String quit() {
-        return null;
+        state = State.EXIT;
+        return SET_TEXT_COLOR_BLUE + "Goodbye! :)";
     }
 
 }

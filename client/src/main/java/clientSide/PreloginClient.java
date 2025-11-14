@@ -14,7 +14,6 @@ public class PreloginClient {
     private static State state = State.SIGNEDOUT;
     private AuthData authData = null;
 
-    public static PrelogResult PrelogResult;
     public record PrelogResult(String authToken, State state){};
 
     public PreloginClient(ServerFacade server) throws ResponseException {
