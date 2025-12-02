@@ -1,5 +1,6 @@
 package websocketServer;
-import websocket.*;
+import websocket.commands.UserGameCommand;
+import websocket.messages.ServerMessage;
 
 public class WebSocketHandler {
 }
