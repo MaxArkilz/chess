@@ -9,8 +9,10 @@ public class GameplayClient {
 
 
     private static State state;
+    private final WebSocketFacade ws;
 
     public GameplayClient(ServerFacade server, WebSocketFacade ws) {
+        this.ws = ws;
     }
 
     public State run(int gameID, String color, String mode, State s) {

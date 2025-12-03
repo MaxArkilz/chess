@@ -13,8 +13,6 @@ public class Main implements NotificationHandler{
     private static String color = null;
     private static String mode = null;
 
-    private WebSocketFacade ws;
-
     public void main(String[] args) {
         String serverUrl = "http://localhost:8080";
         if (args.length == 1) {
@@ -22,7 +20,7 @@ public class Main implements NotificationHandler{
         }
 
         ServerFacade server = new ServerFacade(serverUrl);
-        this.ws = new WebSocketFacade(serverUrl, this);
+        WebSocketFacade ws = new WebSocketFacade(serverUrl, this);
 
         PreloginClient prelog = new PreloginClient(server);
         PostloginClient postlog = new PostloginClient(server);
@@ -43,7 +41,7 @@ public class Main implements NotificationHandler{
                 mode = result.mode();
             }
             else if (state == State.GAMEMODE) {
-                game.connectToGame
+                ws.connect(authToken, gameID);
                 state = game.run(gameID,color,mode,state);
             }
 
