@@ -1,5 +1,6 @@
 package clientside;
 import exception.ResponseException;
+import websocketClient.WebSocketFacade;
 
 import java.util.Arrays;
 import java.util.Scanner;
@@ -9,7 +10,7 @@ public class GameplayClient {
 
     private static State state;
 
-    public GameplayClient(ServerFacade server) {
+    public GameplayClient(ServerFacade server, WebSocketFacade ws) {
     }
 
     public State run(int gameID, String color, String mode, State s) {
