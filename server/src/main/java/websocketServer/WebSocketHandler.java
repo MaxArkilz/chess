@@ -1,13 +1,19 @@
 package websocketServer;
 import chess.ChessGame;
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
+import exception.ResponseException;
 import io.javalin.websocket.*;
+import model.GameData;
 import org.jetbrains.annotations.NotNull;
 import service.GameService;
+import websocket.commands.ConnectCommand;
 import websocket.commands.UserGameCommand;
 import websocket.commands.UserGameCommand.CommandType;
+import websocket.messages.ServerMessage;
 
 import javax.swing.*;
+import javax.websocket.Session;
 import java.io.IOException;
 
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
@@ -31,7 +37,8 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         try {
             switch (action.getCommandType()) {
                 case CONNECT -> {
-                    var cmd = (C)
+                    var cmd = (ConnectCommand) action;
+                    co
                 }
             }
         } catch (IOException ex) {
@@ -44,11 +51,18 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         System.out.println("Websocket closed");
     }
 
-    public void handleMove(WsMessageContext ctx, UserGameCommand command) {
-        /* TODO: extend UserGameCommand to allow command.getMove
-            try/catch to make move through gameService
-            pull updated game from database and push to all clients
-            notify all clients of the move
-         */
+    private void connect(ConnectCommand cmd, Session session) throws ResponseException, IOException, DataAccessException {
+        try {
+            var request = new GameData.JoinGameRequest(cmd.getPlayerRole(),cmd.getGameID());
+            gameService.joinGame(cmd.getAuthToken(),request);
+
+            connections.add(session);
+
+            var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
+            connections.broadcast(session,notification);
+        } catch (ResponseException | DataAccessException ex) {
+            var errorMsg = new ServerMessage(ServerMessage.ServerMessageType.ERROR);
+            connections.
+        }
     }
 }
