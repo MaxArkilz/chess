@@ -1,7 +1,7 @@
 package websocketServer;
 import websocket.messages.ServerMessage;
 
-import javax.websocket.Session;
+import org.eclipse.jetty.websocket.api.Session;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -21,7 +21,7 @@ public class ConnectionManager {
         for (Session c : connections.values()) {
             if (c.isOpen()) {
                 if (!c.equals(excludeSession)) {
-                    c.getBasicRemote().sendText(msg);
+                    c.getRemote().sendString(msg);
                 }
             }
         }
