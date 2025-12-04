@@ -3,6 +3,7 @@ import chess.ChessGame;
 import com.google.gson.Gson;
 import io.javalin.websocket.*;
 import org.jetbrains.annotations.NotNull;
+import service.GameService;
 import websocket.commands.UserGameCommand;
 import websocket.commands.UserGameCommand.CommandType;
 
@@ -11,6 +12,12 @@ import java.io.IOException;
 
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
     private final ConnectionManager connections = new ConnectionManager();
+    private final Gson gson = new Gson();
+    private final GameService gameService;
+
+    public WebSocketHandler(GameService gameService) {
+        this.gameService = gameService;
+    }
 
     @Override
     public void handleConnect(WsConnectContext ctx) {
@@ -20,11 +27,12 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     @Override
     public  void handleMessage(WsMessageContext ctx) {
-        UserGameCommand command = new Gson().fromJson(ctx.message(), UserGameCommand.class);
+        UserGameCommand action = gson.fromJson(ctx.message(), UserGameCommand.class);
         try {
-            switch (command.getCommandType()) {
-                case CONNECT-> handleConnect(ctx);
-                case MAKE_MOVE -> handleMove(ctx,command, );
+            switch (action.getCommandType()) {
+                case CONNECT -> {
+                    var cmd = (C)
+                }
             }
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -36,7 +44,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         System.out.println("Websocket closed");
     }
 
-    public void handleMove(WsMessageContext ctx, UserGameCommand command, String username, int gameID, ChessGame game) {
+    public void handleMove(WsMessageContext ctx, UserGameCommand command) {
         /* TODO: extend UserGameCommand to allow command.getMove
             try/catch to make move through gameService
             pull updated game from database and push to all clients
