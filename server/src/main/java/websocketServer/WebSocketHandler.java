@@ -5,7 +5,11 @@ import dataaccess.DataAccessException;
 import exception.ResponseException;
 import io.javalin.websocket.*;
 import model.GameData;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
+import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import org.jetbrains.annotations.NotNull;
+import server.Server;
 import service.GameService;
 import websocket.commands.*;
 import org.eclipse.jetty.websocket.api.Session;
@@ -18,7 +22,8 @@ import websocket.messages.ServerMessage;
 import javax.swing.*;
 import java.io.IOException;
 
-public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
+@WebSocket
+public class WebSocketHandler{
     private final ConnectionManager connections = new ConnectionManager();
     private final Gson gson = new Gson();
     private final GameService gameService;
@@ -27,13 +32,12 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         this.gameService = gameService;
     }
 
-    @Override
-    public void handleConnect(WsConnectContext ctx) {
+    @OnWebSocketConnect
+    public void handleConnect(Session session) {
+
         System.out.println("Websocket Connected");
-        ctx.enableAutomaticPings();
     }
 
-    @Override
     public  void handleMessage(WsMessageContext ctx) {
         UserGameCommand action = gson.fromJson(ctx.message(), UserGameCommand.class);
         Session session = (Session) ctx.session;
@@ -61,8 +65,8 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
     }
 
-    @Override
-    public void handleClose(@NotNull WsCloseContext wsCloseContext) throws Exception {
+    @OnWebSocketClose
+    public void handleClose(Session session) throws Exception {
         System.out.println("Websocket closed");
     }
 
